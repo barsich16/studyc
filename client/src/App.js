@@ -1,5 +1,5 @@
-import './App.css';
 import 'antd/dist/antd.css';
+import './App.css';
 import { Button, DatePicker } from "antd";
 import MainPage from "./components/MainPage";
 

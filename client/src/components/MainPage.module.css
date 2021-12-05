@@ -20,3 +20,28 @@
 .siteLayout .siteLayoutBackground {
     background: #fff;
 }
+
+/*right sidebar*/
+.wrapper {
+    padding: 5px;
+}
+.rightSider {
+    /*background: rgba(255, 255, 255, 0.3);*/
+    border-left: 2px rgba(0, 21, 41, .15) solid;
+}
+.authProfile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 55px;
+    font-size: 15px;
+    border-bottom: 1px rgba(0, 21, 41, .15) solid;
+    background: #fff;
+}
+.name {
+    margin-left: 15px;
+    font-weight: 600;
+}
+/*.ant-picker-calendar, .ant-picker-calendar-mini, .ant-picker-panel{*/
+/*    background: #0a28ee!important;*/
+/*}*/

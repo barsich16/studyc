@@ -1,6 +1,6 @@
 import styles from './MainPage.module.css';
 import React, {useState} from "react";
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, Calendar, Divider, Avatar, Card} from 'antd';
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -10,6 +10,9 @@ import {
 } from '@ant-design/icons';
 const { SubMenu } = Menu;
 const {Header, Sider, Content} = Layout;
+function onPanelChange(value, mode) {
+    console.log(value, mode);
+}
 const MainPage = () => {
     let [collapsed, setCollapsed] = useState(false);
     return (
@@ -55,14 +58,48 @@ const MainPage = () => {
                 <Content
                     className={styles.siteLayoutBackground}
                     style={{
-                        margin: '24px 16px',
-                        padding: 24,
+                        // margin: '24px 16px',
+                        // padding: 24,
                         minHeight: 280,
                     }}
                 >
                     Content
                 </Content>
             </Layout>
+
+            <Sider trigger={null} theme="light" width="295px" className={styles.rightSider}>
+                <div className={styles.authProfile}>
+                    <Avatar size={35} src="https://joeschmoe.io/api/v1/random" />
+                    <span className={styles.name}>Bohdan Borysenko</span>
+                </div>
+                <div className={styles.wrapper}>
+                    <Calendar fullscreen={false} onPanelChange={onPanelChange} />
+                </div>
+                <div className={styles.eventCards}>
+                    <Card style={{ width: 300, marginTop: 0 }}>
+                        <Card.Meta
+                            avatar={<Avatar shape="square" size={47} src="https://joeschmoe.io/api/v1/random" />}
+                            title="Some new event"
+                            description="This is the description"
+                        />
+                    </Card>
+                    <Card style={{ width: 300, marginTop: 0 }}>
+                        <Card.Meta
+                            avatar={<Avatar shape="square" size={47} src="https://joeschmoe.io/api/v1/random" />}
+                            title="Some new event"
+                            description="This is the description"
+                        />
+                    </Card>
+                    <Card style={{ width: 300, marginTop: 0 }}>
+                        <Card.Meta
+                            avatar={<Avatar shape="square" size={47} src="https://joeschmoe.io/api/v1/random" />}
+                            title="Some new event"
+                            description="This is the description"
+                        />
+                    </Card>
+                </div>
+            </Sider>
+
         </Layout>
     );
 }
