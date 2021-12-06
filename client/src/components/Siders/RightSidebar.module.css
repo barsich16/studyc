@@ -1,0 +1,33 @@
+.rightSider {
+    /*background: rgba(255, 255, 255, 0.3);*/
+    border-left: 2px rgba(0, 21, 41, .15) solid;
+}
+.authProfile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 55px;
+    font-size: 15px;
+    border-bottom: 1px rgba(0, 21, 41, .15) solid;
+    /*border-bottom: 1px #f0f0f0 solid;*/
+    background: #fff;
+}
+.name {
+    margin-left: 15px;
+    font-weight: 700;
+}
+.wrapper {
+    padding: 5px;
+}
+/*.trigger {*/
+/*    padding: 0 24px;*/
+/*    font-size: 18px;*/
+/*    line-height: 64px;*/
+/*    cursor: pointer;*/
+/*    transition: color 0.3s;*/
+/*    color: white;*/
+/*}*/
+
+/*.trigger:hover {*/
+/*    color: #1890ff;*/
+/*}*/

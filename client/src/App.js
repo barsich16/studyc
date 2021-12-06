@@ -1,14 +1,18 @@
 import 'antd/dist/antd.css';
 import './App.css';
-import { Button, DatePicker } from "antd";
-import MainPage from "./components/MainPage";
+import {useRoutes} from "./routes";
+import {BrowserRouter} from "react-router-dom";
 
 function App() {
-  return (
-    <div className="App">
-      <MainPage/>
-    </div>
-  );
+    const routes = useRoutes(true);
+    return (
+        <BrowserRouter>
+            <div className="App">
+                {routes}
+            </div>
+        </BrowserRouter>
+
+    );
 }
 
 export default App;
