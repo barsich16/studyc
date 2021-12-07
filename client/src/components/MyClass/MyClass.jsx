@@ -78,6 +78,43 @@ const data = [
         address: 'Sidney No. 1 Lake Park',
         tags: ['cool', 'teacher'],
     },
+    {
+        key: '4',
+        name: 'John Brown',
+        age: 32,
+        address: 'New York No. 1 Lake Park',
+        tags: ['nice', 'developer'],
+    },
+    {
+        key: '5',
+        name: 'Jim Green',
+        age: 42,
+        address: 'London No. 1 Lake Park',
+        tags: ['loser'],
+    },
+    {
+        key: '6',
+        name: 'Joe Black',
+        age: 32,
+        address: 'Sidney No. 1 Lake Park',
+        tags: ['cool', 'teacher'],
+    }
+];
+const data2 = [
+    {
+        key: '1',
+        name: 'John Brown',
+        age: 32,
+        address: 'New York No. 1 Lake Park',
+        tags: ['nice', 'developer'],
+    },
+    {
+        key: '2',
+        name: 'Jim Green',
+        age: 42,
+        address: 'London No. 1 Lake Park',
+        tags: ['loser'],
+    }
 ];
 
 const {Header, Content} = Layout;
@@ -94,14 +131,16 @@ const MyClass = () => {
                     // padding: 24,
                     minHeight: 280,
                 }}>
-                <div>
+                <div className={styles.tabsContainer}>
                     Мій 10 клас
                     <Tabs defaultActiveKey="1" onChange={callback}>
+
                         <TabPane tab="Учні" key="1">
                             <Table columns={columns} dataSource={data} />
                         </TabPane>
+
                         <TabPane tab="Вчителі" key="2">
-                            Content of Tab Pane 2
+                            <Table columns={columns} dataSource={data2} />
                         </TabPane>
                     </Tabs>
                 </div>

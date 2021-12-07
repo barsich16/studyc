@@ -1,3 +1,6 @@
 .siteLayout .siteLayoutBackground {
     background: #fff;
 }
+.tabsContainer {
+    padding: 20px;
+}

@@ -5,3 +5,28 @@
 /*  display: flex;*/
 /*  justify-content: center;*/
 /*}*/
+.ant-card {
+  background-color: transparent;
+}
+.ant-card-bordered {
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+
+
+.animwrap {
+
+  font-size: 22px;
+  font-weight: 600;
+  padding: 30px;
+  height: 300px;
+  border-radius: 130px;
+}
+.animwrap h1 {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+
+

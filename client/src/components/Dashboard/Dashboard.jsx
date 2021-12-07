@@ -9,13 +9,14 @@ import {
     UploadOutlined,
 } from '@ant-design/icons';
 import {Link} from "react-router-dom";
+import {RightSidebar} from "../Siders/RightSidebar";
 
 const {SubMenu} = Menu;
 const {Header, Sider, Content} = Layout;
 
 export const Dashboard = () => {
     return (
-        <Layout className={styles.siteLayout}>
+            <Layout className={styles.siteLayout}>
             <Header className={styles.siteLayoutBackground} style={{padding: 0}}>
             </Header>
             <Content
@@ -25,7 +26,13 @@ export const Dashboard = () => {
                     // padding: 24,
                     minHeight: 280,
                 }}>
-                Content
+                <div className="animwrap">
+                    Привіт, Богдан
+                    <h1>Що вивчатимемо сьогодні?</h1>
+                </div>
+
+
+                
             </Content>
         </Layout>
     );

@@ -1,4 +1,7 @@
-.siteLayout .siteLayoutBackground {
-    background: #fff;
+/*.siteLayout .siteLayoutBackground {*/
+/*    background: #fff;*/
+/*}*/
+.inner {
+    height: 280px;
+    background-color: #042d53;
 }
-
