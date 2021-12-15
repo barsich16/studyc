@@ -1,16 +1,26 @@
-import 'antd/dist/antd.css';
-import './App.css';
-import {useRoutes} from "./routes";
 import {BrowserRouter} from "react-router-dom";
+import {useAuth} from "./hooks/auth.hook";
+import {useRoutes} from "./routes";
+import './App.css';
+import 'antd/dist/antd.css';
+import {AuthContext} from "./Context/AuthContext";
 
 function App() {
-    const routes = useRoutes(false);
+    const {login, logout, token, userId} = useAuth();
+    console.log("TOKEN: ", !!token);
+    const isAuthenticated = !!token;
+    const routes = useRoutes(isAuthenticated);
     return (
-        <BrowserRouter>
-            <div className="App">
-                {routes}
-            </div>
-        </BrowserRouter>
+        <AuthContext.Provider value={{
+            token, login, logout, userId, isAuthenticated
+        }}>
+            <BrowserRouter>
+                <div className="App">
+                    {routes}
+                </div>
+            </BrowserRouter>
+        </AuthContext.Provider>
+
 
     );
 }

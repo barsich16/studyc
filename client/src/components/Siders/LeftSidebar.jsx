@@ -1,15 +1,22 @@
 import styles from "./LeftSidebar.module.css";
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import {Menu, Layout} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, UserOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
+import {AuthContext} from "../../Context/AuthContext";
 
 const {Sider} = Layout;
 const { SubMenu } = Menu;
 //https://stackoverflow.com/questions/58026188/set-antds-menu-defaultselectedkeys-value-using-react-and-redux
 //добавить фокус на поточний menu.item
 export const LeftSidebar = () => {
+    const auth = useContext(AuthContext);
     let [collapsed, setCollapsed] = useState(false);
+
+    const logoutHandler = () => {
+        auth.logout();
+    }
+
     return (
         <Sider trigger={null} collapsible collapsed={collapsed}>
             <div className={styles.logo}/>
@@ -43,7 +50,7 @@ export const LeftSidebar = () => {
                 <Menu.Item key="6" icon={<UploadOutlined/>}>
                     Чат
                 </Menu.Item>
-                <Menu.Item danger key="7" icon={<UploadOutlined/>}>
+                <Menu.Item onClick={logoutHandler} danger key="7" icon={<UploadOutlined/>}>
                     Вихід
                 </Menu.Item>
             </Menu>

@@ -27,18 +27,23 @@ class AuthController {
     }
     async testRegister (req, res) {
             try {
+                console.log("Body: ", req.body);
+                console.log("Items: ");
                 const {email, password} = req.body;
-                const candidate = testDataUser.find(item => item.email == email);
+                const candidate = testDataUser.find(item => {
+                    console.log(item);
+                    return item.email == email
+                });
                 if (candidate) {
-                    return res.status(400).json({ message: 'Такий користувач вже існує'})
+                    return res.status(400).json({ message: 'Такий користувач вже існує', resultCode: 1})
                 }
                 const hashedPassword = await bcrypt.hash(password, 12);
-                const user = {id: 2, name: 'Admin', surname: 'Adminenko', classID: 2, email: 'email@gmail.com', password: 'password', role: 1}
+                const user = {id: 2, name: 'Admin', surname: 'Adminenko', classID: 2, email: email, password: hashedPassword, role: 1}
                 testDataUser.push(user);
-                console.log(testDataUser);
-                res.status(201).json({ message: 'Користувача створено' })
+                // console.log(testDataUser);
+                res.status(201).json({ message: 'Користувача створено', resultCode: 0 })
             } catch (e) {
-                res.status(500).json({ message: 'Щось пішло не так' })
+                res.status(500).json(e.message)
             }
     }
     async testLogin (req, res) {
@@ -46,12 +51,12 @@ class AuthController {
             const {email, password} = req.body;
             const user = testDataUser.find(item => item.email == email);
             if (!user) {
-                return res.status(400).json({ message: 'Користувача не знайдено'})
+                return res.status(400).json({ message: 'Користувача не знайдено', resultCode: 1})
             }
 
             const isMatch = await bcrypt.compare(password, user.password);
             if(!isMatch) {
-                return res.status(400).json({ message: 'Неправильний пароль'})
+                return res.status(400).json({ message: 'Неправильний пароль', resultCode: 1})
             }
 
             const token = jwt.sign(
@@ -59,11 +64,11 @@ class AuthController {
                 config.get('jwtSecret'),
                 { expiresIn: '1h'}
             );
-            res.json({token, userId: user.id});
+            res.json({token, userId: user.id, resultCode: 0});
 
 
         } catch (e) {
-            res.status(500).json({ message: 'Щось пішло не так' })
+            res.status(500).json({ message: e.message, resultCode: 1 })
         }
     }
 }

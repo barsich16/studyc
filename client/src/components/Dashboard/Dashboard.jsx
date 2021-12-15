@@ -1,11 +1,10 @@
 import styles from './Dashboard.module.css';
 import React, {useState} from "react";
-import {Layout, Menu, Calendar, Divider, Avatar, Card, Button, Steps} from 'antd';
+import {Layout, Avatar, Card, Steps} from 'antd';
 
-const { Step } = Steps;
-const { Meta } = Card;
-const {SubMenu} = Menu;
-const {Header, Sider, Content} = Layout;
+const {Step} = Steps;
+const {Meta} = Card;
+const {Header, Content} = Layout;
 
 export const Dashboard = () => {
     let [current, setCurrent] = useState(-1);
@@ -14,9 +13,10 @@ export const Dashboard = () => {
         setCurrent(currentStep);
     };
     return (
-            <Layout className={styles.siteLayout}>
+        <Layout className={styles.siteLayout}>
             <Header className={styles.siteLayoutBackground} style={{padding: 0}}>
             </Header>
+
             <Content
                 className={styles.siteLayoutBackground}
                 style={{
@@ -29,40 +29,39 @@ export const Dashboard = () => {
                     <h1>Що вивчатимемо сьогодні?</h1>
                     <h3>Уроки сьогодні:</h3>
                     <Steps current={current} onChange={onChange}>
-                        <Step title="1 урок" description="Математика" />
-                        <Step title="2 урок" description="Історія України" />
-                        <Step title="3 урок" description="Географія" />
-                        <Step title="4 урок" description="Фізкультура" />
-                        <Step title="5 урок" description="Англійська мова" />
-                        <Step title="6 урок" description="Фізика" />
+                        <Step title="1 урок" description="Математика"/>
+                        <Step title="2 урок" description="Історія України"/>
+                        <Step title="3 урок" description="Географія"/>
+                        <Step title="4 урок" description="Фізкультура"/>
+                        <Step title="5 урок" description="Англійська мова"/>
+                        <Step title="6 урок" description="Фізика"/>
                     </Steps>
                     <h2>Останні події:</h2>
                     <div className='cardwrapper'>
                         <Card
-                            style={{ width: 235  }}
-                            >
+                            style={{width: 235}}>
                             <Meta
-                                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                                avatar={<Avatar src="https://joeschmoe.io/api/v1/random"/>}
                                 title="Математика"
                                 description="Додано оцінки за контрольну"
                             />
                             <button className='btn first'>Перейти</button>
                         </Card>
                         <Card
-                            style={{ width: 235  }}
-                            >
+                            style={{width: 235}}
+                        >
                             <Meta
-                                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                                avatar={<Avatar src="https://joeschmoe.io/api/v1/random"/>}
                                 title="Географія"
                                 description="Додано оцінки за домашню роботу"
                             />
                             <button className='btn first'>Перейти</button>
                         </Card>
                         <Card
-                            style={{ width: 235  }}
-                            >
+                            style={{width: 235}}
+                        >
                             <Meta
-                                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                                avatar={<Avatar src="https://joeschmoe.io/api/v1/random"/>}
                                 title="Економіка"
                                 description="Тоже дуже класний предмет"
                             />
@@ -70,10 +69,6 @@ export const Dashboard = () => {
                         </Card>
                     </div>
                 </div>
-
-
-
-                
             </Content>
         </Layout>
     );

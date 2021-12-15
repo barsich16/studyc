@@ -1,4 +1,4 @@
-import {Route, Routes, Navigate} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import {Dashboard} from "./components/Dashboard/Dashboard";
 import MyClass from "./components/MyClass/MyClass";
 import {MainPage} from "./components/MainPage";
