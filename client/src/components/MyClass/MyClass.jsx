@@ -1,103 +1,58 @@
 import styles from "./MyClass.module.css";
-import {Layout, Tabs, Table, Tag, Space} from "antd";
+import {Layout, Tabs, Table} from "antd";
+import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {getClass} from "../../redux/userReducer";
+import {getClassmatesSelector} from "../../redux/userSelector";
 
-const { TabPane } = Tabs;
+const {TabPane} = Tabs;
+
 function callback(key) {
     console.log(key);
 }
 
-//Table
+const sortRowBySurname = (a, b) => {
+    if (a.surname < b.surname) {
+        return -1
+    } else if (a.surname > b.surname)
+        return 1
+    else {
+        return 0
+    }
+}
 const columns = [
     {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
+        title: 'Номер',
+        dataIndex: 'id',
+        key: 'id',
+    },
+    {
+        title: 'Прізвище',
+        dataIndex: 'surname',
+        key: 'surname',
+        // defaultSortOrder: 'ascend',
+        sorter: sortRowBySurname,
         render: text => <a>{text}</a>,
     },
     {
-        title: 'Age',
-        dataIndex: 'age',
-        key: 'age',
+        title: 'Ім\'я',
+        dataIndex: 'name',
+        key: 'name',
     },
     {
-        title: 'Address',
-        dataIndex: 'address',
-        key: 'address',
+        title: 'По-батькові',
+        dataIndex: 'patronymic',
+        key: 'patronymic',
     },
     {
-        title: 'Tags',
-        key: 'tags',
-        dataIndex: 'tags',
-        render: tags => (
-            <>
-                {tags.map(tag => {
-                    let color = tag.length > 5 ? 'geekblue' : 'green';
-                    if (tag === 'loser') {
-                        color = 'volcano';
-                    }
-                    return (
-                        <Tag color={color} key={tag}>
-                            {tag.toUpperCase()}
-                        </Tag>
-                    );
-                })}
-            </>
-        ),
+        title: 'Телефон',
+        dataIndex: 'phone',
+        key: 'phone',
     },
     {
-        title: 'Action',
-        key: 'action',
-        render: (text, record) => (
-            <Space size="middle">
-                <a>Invite {record.name}</a>
-                <a>Delete</a>
-            </Space>
-        ),
-    },
-];
-
-const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        tags: ['nice', 'developer'],
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        tags: ['loser'],
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        tags: ['cool', 'teacher'],
-    },
-    {
-        key: '4',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        tags: ['nice', 'developer'],
-    },
-    {
-        key: '5',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        tags: ['loser'],
-    },
-    {
-        key: '6',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-        tags: ['cool', 'teacher'],
+        title: 'Email',
+        dataIndex: 'email',
+        key: 'email',
     }
 ];
 const data2 = [
@@ -119,8 +74,27 @@ const data2 = [
 
 const {Header, Content} = Layout;
 const MyClass = () => {
+    const dispatch = useDispatch();
+    const classmates = useSelector(getClassmatesSelector);
+    const role = useSelector(state => state.user.profile.role);
+    const deletePupilHandler = event => {
+        // Here must be async deleting pupil
+        //console.log(event.target.dataset.value);
+    }
+    if (role === 2) {
+        columns.push({
+                title: 'Дія',
+                key: 'action',
+                render: (text, record) => (
+                    <a data-value={record.id} onClick={deletePupilHandler}>Видалити</a>
+                ),
+            });
+    }
+    useEffect(() => {
+        dispatch(getClass());
+    }, [])
     return (
-        <Layout >
+        <Layout>
             <Header style={{}}>
                 Мій 10 клас
             </Header>
@@ -136,11 +110,11 @@ const MyClass = () => {
                     <Tabs defaultActiveKey="1" onChange={callback}>
 
                         <TabPane tab="Учні" key="1">
-                            <Table columns={columns} dataSource={data} />
+                            <Table columns={columns} dataSource={classmates}/>
                         </TabPane>
 
                         <TabPane tab="Вчителі" key="2">
-                            <Table columns={columns} dataSource={data2} />
+                            <Table columns={columns} dataSource={data2}/>
                         </TabPane>
                     </Tabs>
                 </div>

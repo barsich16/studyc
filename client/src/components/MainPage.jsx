@@ -1,22 +1,23 @@
 import {Button, Layout, Modal} from "antd";
-import {useState, useEffect, useContext} from 'react';
+import {useState, useEffect} from 'react';
 import styles from './MainPage.module.css'
 import {useHttp} from "../hooks/http.hook";
 import {useMessage} from "../hooks/messages.hook";
-import {AuthContext} from "../Context/AuthContext";
+import {useDispatch} from "react-redux";
+import {login} from "../redux/userReducer";
 const { Header, Footer, Content } = Layout;
 
 export const MainPage = () => {
-    const auth = useContext(AuthContext);
-
+    const dispatch = useDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const [registrationForm, setRegistrationForm] = useState({email: '', password: '', name: ''});
     const [loginForm, setLoginForm] = useState({email: '', password: ''});
 
     const [isSelectedLogin, setIsSelectedLogin] = useState(false);
-    const {loading, request, status, clearStatus} = useHttp();
+    const {request, status, clearStatus} = useHttp();
     const message = useMessage();
+    const [onRequest, setOnRequest] = useState(false);
 
     useEffect(() => {      //показуємо статус повідомлення реєстрації
         message(status);
@@ -25,7 +26,6 @@ export const MainPage = () => {
 
     const registerHandler = async () => {  //запит на реєстрацію
         try {
-            console.log(registrationForm);
             const data = await request('/api/auth/register', 'POST', {...registrationForm});
             console.log('Data: ', data);
         } catch (e) {
@@ -33,9 +33,12 @@ export const MainPage = () => {
     };
     const loginHandler = async () => {  //запит на логін
         try {
+            setOnRequest(true)
             console.log(loginForm);
             const data = await request('/api/auth/login', 'POST', {...loginForm});
-            auth.login(data.token, data.userId);
+            dispatch(login(data.userId, data.token, data.role));
+            setOnRequest(false)
+            // auth.login(data.token, data.userId);
         } catch (e) {
         }
     }
@@ -60,8 +63,9 @@ export const MainPage = () => {
     const handleCancel = () => {
         setIsModalVisible(false);
     };
+
     return (
-        <Layout>
+        <Layout className={styles.layout}>
             <Header className={styles.header}>
                 <span className={styles.logo}>Logo</span>
                 <div className="loginButtons">
@@ -74,8 +78,10 @@ export const MainPage = () => {
                 </div>
 
             </Header>
-            <Content>main content</Content>
-            <Footer>footer</Footer>
+            <Content className={styles.content}>
+                {/*<div className={styles.title}>Оцініть справжні переваги дистанційного навчання</div>*/}
+            </Content>
+            <Footer className={styles.footer}>footer</Footer>
             <Modal onCancel={handleCancel} bodyStyle={{padding: 0}} width={768} footer={null} visible={isModalVisible}>
                 <div className={`${styles.container} ${isSelectedLogin ? "" : styles.rightPanelActive}`} id="container">
                     <div className={`${styles.formContainer} ${styles.signUpContainer}`}>
@@ -84,7 +90,7 @@ export const MainPage = () => {
                             <input type="text" onChange={changeRegistrationHandler} name='name' placeholder="Ім'я"/>
                             <input type="email"  name='email' onChange={changeRegistrationHandler} placeholder="Email"/>
                             <input type="password" name='password' onChange={changeRegistrationHandler} placeholder="Пароль"/>
-                            <button onClick={registerHandler} disabled={loading}>Зареєструватися</button>
+                            <button onClick={registerHandler} disabled={onRequest}>Зареєструватися</button>
                         </div>
                     </div>
                     <div className={`${styles.formContainer} ${styles.signInContainer}`}>
@@ -92,7 +98,7 @@ export const MainPage = () => {
                             <h1>Увійти</h1>
                             <input type="email" onChange={changeLoginHandler} name='email' placeholder="Email"/>
                             <input type="password" onChange={changeLoginHandler} name='password' placeholder="Пароль"/>
-                            <button onClick={loginHandler} disabled={loading}>Увійти</button>
+                            <button onClick={loginHandler} disabled={onRequest}>Увійти</button>
                         </div>
                     </div>
                     <div className={styles.overlayContainer}>
@@ -112,7 +118,6 @@ export const MainPage = () => {
                 </div>
             </Modal>
         </Layout>
-
     );
 }
 

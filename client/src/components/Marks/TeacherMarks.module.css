@@ -1,0 +1,28 @@
+.tabsContainer table td:nth-child(1), .tabsContainer table td:nth-child(2),.tabsContainer table td:last-child{
+    background-color: #ebebf1;
+    z-index: 2;
+}
+.tabsContainer {
+    padding: 20px;
+}
+/*.siteLayout .siteLayoutBackground {*/
+/*    background: #dd1414;*/
+/*}*/
+.cells {
+    padding: 2px!important;
+}
+.pad0 {
+    padding: 0px!important;
+}
+/*.input{*/
+/*    max-height: 10px!important;*/
+/*}*/
+.btn_wrap {
+    display: flex;
+    justify-content: right;
+    margin-top: 20px;
+}
+.tableWrapper {
+    width: 30%;
+    margin: 10px;
+}

@@ -2,29 +2,26 @@ import styles from "./RightSidebar.module.css";
 import {Avatar, Calendar, Card, Layout} from "antd";
 import React from "react";
 import {Route, Routes} from "react-router-dom";
-// import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
-// import {LeftSidebar} from "./LeftSidebar";
-// import {Dashboard} from "../Dashboard/Dashboard";
-// import MyClass from "../MyClass/MyClass";
-
+import {useSelector} from "react-redux";
+import {getClassTeacherSelector, getProfileSelector} from "../../redux/userSelector";
 const {Sider} = Layout;
-
-function onPanelChange(value, mode) {
-    console.log(value, mode);
-}
-
+// function onPanelChange(value, mode) {
+//     console.log(value, mode);
+// }
 export const RightSidebar = () => {
-    //let [collapsed, setCollapsed] = useState(false);
+    const profile = useSelector(getProfileSelector);
     // якщо робити collaps то в sider добавить collapsible collapsed={collapsed}
     return (
         <Routes>
-            <Route path="/" element={<SidebarDashboard/>}/>
-            <Route path="/myclass" element={<SidebarClass />}/>
+            <Route path="/" element={<SidebarDashboard profile = {profile}/>}/>
+            <Route path="/myclass" element={<SidebarClass profile = {profile}/>}/>
+            <Route path="/subjects/:id" element={<SidebarDashboard profile = {profile}/>}/>
         </Routes>
     )
 }
 
-const SidebarDashboard = () => {
+const SidebarDashboard = ({profile}) => {
+    const name = profile ? `${profile.name} ${profile.surname}` : '';
     return (
         <Sider trigger={null}  theme="light" width="295px" className={styles.rightSider}>
             <div className={styles.authProfile}>
@@ -37,31 +34,31 @@ const SidebarDashboard = () => {
                 {/*    }}/>*/}
                 {/*}*/}
                 <Avatar size={35} src="https://joeschmoe.io/api/v1/random" />
-                <span className={styles.name}>Bohdan Borysenko</span>
+                <span className={styles.name}>{`${name}`}</span>
             </div>
             <div className={styles.wrapper}>
-                <Calendar fullscreen={false} onPanelChange={onPanelChange} />
+                <Calendar fullscreen={false} />
             </div>
             <div className={styles.eventCards}>
                 <Card style={{ width: 300, marginTop: 0}}>
                     <Card.Meta
                         avatar={<Avatar shape="square" size={47} src="https://joeschmoe.io/api/v1/random" />}
                         title="Some new event"
-                        description="This is the description"
+                        description="This is a description"
                     />
                 </Card>
                 <Card style={{ width: 300, marginTop: 0 }}>
                     <Card.Meta
                         avatar={<Avatar shape="square" size={47} src="https://joeschmoe.io/api/v1/random" />}
                         title="Some new event"
-                        description="This is the description"
+                        description="This is a description"
                     />
                 </Card>
                 <Card style={{ width: 300, marginTop: 0 }}>
                     <Card.Meta
                         avatar={<Avatar shape="square" size={47} src="https://joeschmoe.io/api/v1/random" />}
                         title="Some new event"
-                        description="This is the description"
+                        description="This is a description"
                     />
                 </Card>
             </div>
@@ -69,7 +66,9 @@ const SidebarDashboard = () => {
     )
 }
 
-const SidebarClass = () => {
+const SidebarClass = ({profile}) => {
+    const classTeacher = useSelector(getClassTeacherSelector);
+    const name = classTeacher ? `${classTeacher.name} ${classTeacher.surname}` : ''
     return (
         <Sider trigger={null}  theme="light" width="295px" className={styles.rightSider}>
             <div className={styles.authProfile}>
@@ -82,11 +81,11 @@ const SidebarClass = () => {
                 {/*    }}/>*/}
                 {/*}*/}
                 <Avatar size={35} src="https://joeschmoe.io/api/v1/random" />
-                <span className={styles.name}>Bohdan Borysenko</span>
+                <span className={styles.name}>{`${profile.name} ${profile.surname}`}</span>
             </div>
             <div className={styles.eventCard}>
                 <Avatar size={120} src="https://joeschmoe.io/api/v1/random" />
-                <span className={styles.teacherName}>Teacher Name</span>
+                <span className={styles.teacherName}>{name}</span>
                 <span className={styles.classTeacher}>Класний керівник</span>
                 <div className={styles.info}>
                     <div className={styles.about}>

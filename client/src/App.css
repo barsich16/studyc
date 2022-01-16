@@ -87,8 +87,45 @@
 }
 .ant-modal-content {
   border-radius: 30px;
+  background-color: transparent!important;
 }
 .ant-modal-close {
   z-index: 1001;
 }
+
+/* Для вчительського журналу обліку*/
+.editable-cell {
+  position: relative;
+}
+
+.editable-cell-value-wrap {
+  /*padding: 1px 4px;*/
+  cursor: pointer;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  /*padding: 1px 4px;*/
+  /*border: 1px solid #d9d9d9;*/
+  /*border-radius: 2px;*/
+}
+
+/*[data-theme='dark'] .editable-row:hover .editable-cell-value-wrap {*/
+/*  border: 1px solid #434343;*/
+/*}*/
+.marks-wrapper.ant-form-item {
+  max-width: 31px!important;
+}
+.marks-wrapper.ant-form-item:first-child {
+  max-height: 23px!important;
+}
+.ant-form-item-control-input {
+  min-height: auto!important;
+  width: auto!important;
+
+}
+.ant-input-sm{
+  padding: 0 0px!important;
+  text-align: center;
+}
+
 
