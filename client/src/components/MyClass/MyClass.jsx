@@ -2,8 +2,10 @@ import styles from "./MyClass.module.css";
 import {Layout, Tabs, Table} from "antd";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
+import {connect} from "react-redux";
 import {getClass} from "../../redux/userReducer";
 import {getClassmatesSelector} from "../../redux/userSelector";
+import {useFetching} from "../../hooks/useFetching.hook";
 
 const {TabPane} = Tabs;
 
@@ -73,10 +75,11 @@ const data2 = [
 ];
 
 const {Header, Content} = Layout;
-const MyClass = () => {
-    const dispatch = useDispatch();
-    const classmates = useSelector(getClassmatesSelector);
-    const role = useSelector(state => state.user.profile.role);
+const MyClass = ({getClass, classmates, role}) => {
+    const {fetching, loading} = useFetching();
+    // const dispatch = useDispatch();
+    // const classmates = useSelector(getClassmatesSelector);
+    // const role = useSelector(state => state.user.profile.role);
     const deletePupilHandler = event => {
         // Here must be async deleting pupil
         //console.log(event.target.dataset.value);
@@ -91,7 +94,7 @@ const MyClass = () => {
             });
     }
     useEffect(() => {
-        dispatch(getClass());
+        getClass();
     }, [])
     return (
         <Layout>
@@ -122,4 +125,9 @@ const MyClass = () => {
         </Layout>
     );
 }
-export default MyClass;
+
+const mapState = state => ({
+    role: state.user.profile.role,
+    classmates: state.user.classmates
+})
+export default connect(mapState, {getClass})(MyClass);

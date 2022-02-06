@@ -128,4 +128,28 @@
   text-align: center;
 }
 
+/*Для динамічного додавання подій в розділі предмети*/
+.ant-space-item .ant-form-item{
+  margin-bottom: 20px!important;
+}
 
+/*Для полів реєстрації та кнопки*/
+.formreg .ant-form-item {
+  margin-bottom: 10px!important;
+}
+.formreg .ant-form-item:last-child .ant-btn {
+  height: auto!important;
+}
+
+
+/*Для номеру класу в налаштуваннях*/
+.ant-form-text {
+  padding-top: 4px;
+  font-size: 15px;
+}
+/*Для зміни заднього фону при autocomplete chrome*/
+input:-webkit-autofill {
+  -webkit-box-shadow: inset 0 0 0 50px #fff !important; /* Цвет фона */
+  /*-webkit-text-fill-color: #999 !important; !* цвет текста *!*/
+  color: #999 !important; /* цвет текста */
+}

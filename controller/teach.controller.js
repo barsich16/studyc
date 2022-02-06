@@ -5,11 +5,13 @@ const testClass = require('../data').class;
 const testStudyPlans = require('../data').studyPlans;
 const testDataPlansEvents = require('../data').plansEvents;
 const testDataStudyEvents = require('../data').studyEvents;
-
+const testTypesEvents = require('../data').typesEvents;
 
 class TeachController {
     async testGetMarksInfo (req, res) {
         try {
+            const userId = +req.params.id;
+            console.log("User: ", userId);
             //req.user.userId
             //{id: 1, name: 'Математика', teacherId: 2, classId: 2, studyPlan: 1},
             // const subjects = testDataSubjects.filter(item => {
@@ -40,12 +42,13 @@ class TeachController {
     }
     async testGetSubjectsInfo (req, res) {
         try {
+            const userId = +req.params.id;
             // const subjectsArray = [];
             // Object.assign(subjectsArray, testDataSubjects);
             //console.log("here", subjectsArray);
             //{id: 1, name: 'Математика', teacherId: 2, classId: 2, studyPlan: 1},
             const subjects = testDataSubjects.filter(item => {
-                return item.teacherId == req.user.userId
+                return item.teacherId == userId
             });
             const result = subjects.map(item => {
                 const eventIdArray = testDataPlansEvents.filter(planEvent => {
@@ -63,10 +66,30 @@ class TeachController {
                     }),
                 };
             })
-            res.json(result);
+            res.json({subjects: result, types: testTypesEvents});
 
         } catch (e) {
             res.status(500).json('Помилка при пошуку');
+        }
+    }
+    async testUpdateSubjectInfo (req, res) {
+        try {
+            console.log(req.body);
+            const newSubjectInfo = req.body;
+            // const oldSubjectInfo = testDataSubjects.find(subject => subject.id = newSubjectInfo.id);
+            // oldSubjectInfo.link = newSubjectInfo.link;
+            // oldSubjectInfo.other = newSubjectInfo.other;
+            // const shouldChangedItems = testDataPlansEvents.filter(item => item.planId == oldSubjectInfo.studyPlan);
+            // let shouldChangedEvents = shouldChangedItems.map(item => {
+            //     return testDataStudyEvents.find(j => item.eventId == j.id);
+            // })
+            // console.log("Result: ", shouldChangedEvents);
+            // shouldChangedEvents = newSubjectInfo.events;
+            // console.log(testDataStudyEvents);
+
+            res.json({message: 'Збережено (Доробить)'});
+        } catch (e) {
+            res.status(500).json('Помилка при пошуку оцінок');
         }
     }
 

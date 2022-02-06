@@ -8,7 +8,11 @@ export const useFetching = () => {
         try {
             setLoading(true);
             const result = await callback(...parametres);
-            message.success(result.message);
+            console.log("i am: ", result);
+            if (!result.notShow) {
+                message.success(result.message);
+            }
+
         } catch (e) {
             message.error(e.message);
         } finally {

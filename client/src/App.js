@@ -3,15 +3,17 @@ import {generateRoutes} from "./routes";
 import Loader from "./components/Loader";
 import {useEffect, useState} from "react";
 import {connect, useDispatch} from "react-redux";
-import {login} from "./redux/userReducer";
+import {login, partLogin} from "./redux/userReducer";
 import './App.css';
 import 'antd/dist/antd.css';
 import {setStatusMessage} from "./redux/teacherReducer";
 //import {useFetching} from "./hooks/useFetching.hook";
 import {message} from "antd";
+import {useFetching} from "./hooks/useFetching.hook";
 
-const App = ({isAuthenticated, isLoginizationFinished, role, login}) => {
+const App = ({isAuthenticated, isLoginizationFinished, role, partLogin}) => {
     const storageName = 'userData';
+    const {fetching} = useFetching();
     const [ready, setReady] = useState(false);
     const [isLocalStorage, setIsLocalStorage] = useState(true);
 
@@ -19,12 +21,12 @@ const App = ({isAuthenticated, isLoginizationFinished, role, login}) => {
         if (!ready) {
             const data = JSON.parse(localStorage.getItem(storageName));
             if (data && data.token) {
-                //fetching(login, data.userId, data.token, data.role);
-                login(data.userId, data.token, data.role).then(tokenExpired => {
-                    if (tokenExpired) {
-                        message.error("Термін дії токену вийшов");
-                    }
-                })
+                fetching(partLogin, data.userId, data.token, data.role);
+                // login(data.userId, data.token, data.role).then(tokenExpired => {
+                //     if (tokenExpired) {
+                //         message.error("Термін дії токену вийшов");
+                //     }
+                // })
                 setReady(true);
             } else {
                 setIsLocalStorage(false);
@@ -52,5 +54,5 @@ const mapState = state => ({
     isLoginizationFinished: state.user.isLoginizationFinished,
     role: state.user.role
 });
-export default connect(mapState, {setStatusMessage, login})(App);
+export default connect(mapState, {setStatusMessage, partLogin})(App);
 

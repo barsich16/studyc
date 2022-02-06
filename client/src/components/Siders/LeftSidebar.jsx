@@ -35,13 +35,13 @@ export const LeftSidebar = () => {
                 {}
                 <SubMenu key="2" icon={<UserOutlined />} title="Предмети">
                     <Menu.Item key="sub1">
-                        <Link to="/settings">Математика</Link>
+                        <Link to="/development">Математика</Link>
                     </Menu.Item>
                     <Menu.Item key="sub2">
-                        <Link to="/settings">Історія України</Link>
+                        <Link to="/development">Історія України</Link>
                     </Menu.Item>
                     <Menu.Item key="sub3">
-                        <Link to="/settings">Географія</Link>
+                        <Link to="/development">Географія</Link>
                     </Menu.Item>
                 </SubMenu>
                 <Menu.Item key="3" icon={<UserOutlined/>}>
@@ -51,7 +51,7 @@ export const LeftSidebar = () => {
                     <Link to="/myclass">Мій Клас</Link>
                 </Menu.Item>
                 <Menu.Item key="5" icon={<UploadOutlined/>}>
-                    <Link to="/settings">Розклад</Link>
+                    <Link to="/development">Розклад</Link>
                 </Menu.Item>
                 <Menu.Item key="6" icon={<UploadOutlined/>}>
                     <Link to="/settings">Налаштування</Link>

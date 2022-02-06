@@ -1,13 +1,21 @@
+require('dotenv').config();
 const express = require('express');
 const config = require('config');
+const cookieParser = require("cookie-parser");
 //const mongoose = require('mongoose');
+const errorMiddleware = require('./middleware/error.middleware');
 
 const app = express();
 app.use(express.json({ extended: true }));
+app.use(cookieParser());
+//add cors
+
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/user', require('./routes/user.routes'));
 app.use('/api/teach', require('./routes/teach.routes'));
-const PORT = config.get('port') || 5000;
+app.use('/api/admin', require('./routes/admin.routes'));
+app.use(errorMiddleware);
+const PORT = process.env.PORT || 5000;
 
 async function start() {
     try{

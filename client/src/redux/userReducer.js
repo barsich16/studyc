@@ -1,4 +1,4 @@
-import {userAPI} from "./apiRequests";
+import {teachAPI, userAPI} from "./apiRequests";
 
 const storageName = 'userData';
 
@@ -100,25 +100,26 @@ const setUserId = userId => ({type: 'SET-USERID', userId});
 export const setIsAuthenticated = payload => ({type: 'SET-IS-AUTHENTICATED', payload});
 const setLogout = () => ({type: 'LOGOUT'});
 export const setIsTokenExpired = (payload) => ({type: 'SET_IS_TOKEN_EXPIRED', payload});
-const setClass = (classmates, classTeacher) => ({type: 'SET_CLASS', classmates, classTeacher });
+const setClass = (classmates, classTeacher) => ({type: 'SET_CLASS', classmates, classTeacher});
 const setIsLoginizationFinished = () => ({type: 'SET_LOGINIZATION_FINISHED'});
 const setMarks = payload => ({type: 'SET_PUPIL_MARKS', payload});
 const setRole = payload => ({type: 'SET_ROLE', payload});
 
-export const login = (userId, token, role) => {       //Thunk Creator
-    return async (dispatch) => {
-        dispatch(setLoading(true));
-
-        const promiseResult = await dispatch(getProfile(token));
-        if (promiseResult) {
-            const tokenExpired = true;
-            dispatch(setIsTokenExpired(true))
-            dispatch(setIsAuthenticated(false));
-            dispatch(setLoading(false));
-            dispatch(setIsLoginizationFinished(true));
-            localStorage.removeItem(storageName);
-            return tokenExpired;
-        } else {
+export const register = (values) => {
+    return async dispatch => {
+        try {
+            const result = await userAPI.register(values);
+            console.log(result);
+            return result;
+        } catch (e) {
+            throw e;
+        }
+    }
+}
+export const partLogin = (userId, token, role) => {
+    return async dispatch => {
+        try {
+            await dispatch(getProfile(token));
             dispatch(setToken(token));
             dispatch(setUserId(userId));
             dispatch(setIsAuthenticated(true));
@@ -126,48 +127,85 @@ export const login = (userId, token, role) => {       //Thunk Creator
             localStorage.setItem(storageName, JSON.stringify({
                 userId, token, role
             }));
-
             dispatch(setLoading(false));
             dispatch(setIsLoginizationFinished(true));
+            return {notShow: true}
+        }
+        catch (e) {
+            dispatch(setIsTokenExpired(true))
+            dispatch(setIsAuthenticated(false));
+            dispatch(setLoading(false));
+            dispatch(setIsLoginizationFinished(true));
+            localStorage.removeItem(storageName);
+            throw e;
+        }
+    }
+}
+
+export const fullLogin = formValues => {       //Thunk Creator
+    return async (dispatch) => {
+        // dispatch(setLoading(true));
+        try {
+            const dataLogin = await userAPI.login(formValues);
+            const {userId, token, role} = dataLogin;
+            dispatch(partLogin(userId, token, role));
+            return {message: 'Вхід виконано'}
+        } catch (e) {
+            // return {message: e.message};
+            throw e;
         }
     };
 }
 
 export const getProfile = (token) => {
     return async dispatch => {
-        const profile = await userAPI.getProfile(token);
-        if (profile.JWTExpired) {
-            const tokenExpired = true;
-            return tokenExpired;
-        } else {
+        try {
+            const profile = await userAPI.getProfile(token);
             dispatch(setProfile(profile));
+        } catch (e) {
+            throw e
+        }
+    }
+}
+export const updateProfile = (newProfileInfo) => {
+    return async (dispatch, getState) => {
+        try {
+            const token = getState().user.token;
+            const result = await userAPI.updateProfileInfo(token, newProfileInfo);
+            console.log(result);
+            return result;
+        } catch (e) {
+            throw e;
         }
     }
 }
 export const getClass = () => {
     return async (dispatch, getState) => {
+        try {
+            const token = getState().user.token;
+            const classId = getState().user.profile.classID;
+            const {classmates, classTeacher} = await userAPI.getClass(token, classId);
+            dispatch(setClass(classmates, classTeacher));
+        } catch(e) {
+            dispatch(logout());
+            //dispatch(setIsAuthenticated(false));
+            throw e
 
-        const token = getState().user.token;
-        const classId = getState().user.profile.classID;
-        const classInfo = await userAPI.getClass(token, classId);
-        if (classInfo.JWTExpired) {
-            dispatch(setIsTokenExpired(true));
-            dispatch(setIsAuthenticated(false));
-        } else if (classInfo.resultCode === 0){
-            dispatch(setClass(classInfo.classmates, classInfo.classTeacher));
+
         }
+        // if (classInfo.JWTExpired) {
+        //     dispatch(setIsTokenExpired(true));
+        //     dispatch(setIsAuthenticated(false));
+        // } else if (classInfo.resultCode === 0) {
+        //     dispatch(setClass(classInfo.classmates, classInfo.classTeacher));
+        // }
     }
 }
 export const getMarks = () => {
     return async (dispatch, getState) => {
-        const token = getState().user.token;
-        const marksInfo = await userAPI.getMarks(token);
-        if (marksInfo.JWTExpired) {
-            dispatch(setIsTokenExpired(true));
-            dispatch(setIsAuthenticated(false));
-        } else {
-            dispatch(setMarks(marksInfo));
-        }
+        const userId = getState().user.userId;
+        const marksInfo = await userAPI.getMarks(userId);
+        dispatch(setMarks(marksInfo));
 
     }
 }

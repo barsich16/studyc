@@ -121,14 +121,15 @@ let testClass = [
 //     {id: 4, name: 'Ivan', surname: 'Ivanenko', patronymic: 'Ivanovych', classID: 4, email: 'email7@gmail.com', password: 'password', role: 2}
 // ]
 const testDataSubjects = [
-    {id: 1, name: 'Математика', teacherId: 2, classId: 2, studyPlan: 1, link: ''},
-    {id: 2, name: 'Алгебра', teacherId: 2, classId: 1, studyPlan: 1, link: ''},
-    {id: 3, name: 'Геометрія', teacherId: 2, classId: 2, studyPlan: 1, link: ''},
-    {id: 4, name: 'Фізика', teacherId: 2, classId: 2, studyPlan: 1, link: ''},
+    {id: 1, name: 'Математика', teacherId: 2, classId: 2, studyPlan: 1, other: '', link: 'https://us04web.zoom.us/j/9937940977?pwd=Y1praFZJdkhXQTliemFBZkZVZmxUUT09#success'},
+    {id: 2, name: 'Алгебра', teacherId: 2, classId: 1, studyPlan: 2, other: '', link: ''},
+    {id: 3, name: 'Геометрія', teacherId: 2, classId: 2, studyPlan: 1, other: '', link: ''},
+    {id: 4, name: 'Фізика', teacherId: 2, classId: 2, studyPlan: 1, other: '', link: ''},
 
 ];
 const testDataStudyPlans = [
-    {id: 1, name: 'Основний', teacherId: 2, classNumber: 10}
+    {id: 1, name: 'Основний', teacherId: 2, classNumber: 10},
+    {id: 2, name: 'Основний2', teacherId: 2, classNumber: 10},
 ]
 
 // Таблиця Багато до багатьох для зв'язку навчальних планів та подій
@@ -138,19 +139,26 @@ const testDataPlansEvents = [
     {planId: 1, eventId: 3},
     {planId: 1, eventId: 4},
     {planId: 1, eventId: 5},
-    {planId: 1, eventId: 6}
+    {planId: 1, eventId: 6},
+    {planId: 2, eventId: 5},
 ]
 const testDataStudyEvents = [
-    {id: 1, name: 'Контрольна 1', shortName: 'КР1'},
-    {id: 2, name: 'Контрольна 2', shortName: 'КР2'},
-    {id: 3, name: 'Контрольна 3', shortName: 'КР3'},
-    {id: 4, name: 'Самостійна 1', shortName: 'СР1'},
-    {id: 5, name: 'Контрольна 4', shortName: 'КР4'},
-    {id: 6, name: 'Самостійна 2', shortName: 'СР2'}
+    {id: 1, name: 'Додавання дробів', shortName: 'КР1', typeId: 1},
+    {id: 2, name: 'Інтеграли', shortName: 'КР2', typeId: 1},
+    {id: 3, name: 'Похідні', shortName: 'КР3', typeId: 1},
+    {id: 4, name: 'Границі функцій', shortName: 'СР1', typeId: 2},
+    {id: 5, name: 'Інтеграли 2-го порядку', shortName: 'КР4', typeId: 1},
+    {id: 6, name: 'Первісна функції', shortName: 'СР2', typeId: 2}
 ]
-const testDataMarks = [
-    {id: 1, subjectId: 1, studentId: 20, mark: 8, eventId: 1}
+const testTypesEvents = [
+    {id: 1, type: 'Контрольна робота'},
+    {id: 2, type: 'Самостійна робота'},
+    {id: 3, type: 'Семестрова робота'},
+    {id: 4, type: 'Диктант'},
 ]
+// const testDataMarks = [
+//     {id: 1, subjectId: 1, studentId: 20, mark: 8, eventId: 1}
+// ]
 const globalMarksArray = {
     '10-A Алгебра': [
         {
@@ -497,3 +505,4 @@ exports.pupilMarks = globalPupilMarksArray;
 //exports.teachers = globalMarksArray;
 exports.class = testClass;
 exports.plansEvents = testDataPlansEvents;
+exports.typesEvents = testTypesEvents;

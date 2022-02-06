@@ -54,7 +54,7 @@
 }
 
 .container span {
-    font-size: 12px;
+    /*font-size: 12px;*/
 }
 
 .container a {
@@ -71,14 +71,15 @@
     color: #FFFFFF;
     font-size: 12px;
     font-weight: bold;
-    padding: 12px 45px;
+    padding: 11px 50px;
     letter-spacing: 1px;
     text-transform: uppercase;
     transition: transform 80ms ease-in;
 }
 
-.container button:active {
-    transform: scale(0.95);
+.container button:hover {
+    transform: scale(1.05);
+    background-color: #FF4B2B;
 }
 
 .container button:focus {
@@ -88,6 +89,8 @@
 .container button.ghost {
     background-color: transparent;
     border-color: #FFFFFF;
+    cursor: pointer;
+    margin-top: 15px;
 }
 
 .formInner {
@@ -101,13 +104,17 @@
     text-align: center;
 }
 
-.container input {
-    background-color: #eee;
-    border: none;
-    padding: 12px 15px;
-    margin: 8px 0;
-    width: 100%;
-}
+/*.formInner .ant-form-item-control {*/
+/*    width: 100%!important*/
+/*}*/
+
+/*.container input {*/
+/*    background-color: #eee;*/
+/*    !*border: none;*!*/
+/*    !*padding: 12px 15px;*!*/
+/*    !*margin: 8px 0;*!*/
+/*    width: 100%!important;*/
+/*}*/
 
 .container {
     background-color: transparent;
@@ -172,7 +179,7 @@
     height: 100%;
     overflow: hidden;
     transition: transform 0.2s ease-in-out;
-    z-index: 100;
+    z-index: 9;
 }
 
 .container.rightPanelActive .overlayContainer{
@@ -236,3 +243,27 @@
 .container.rightPanelActive .overlayRight {
     transform: translateX(20%);
 }
+
+
+/*.radio {*/
+/*    display: flex;*/
+/*    justify-content: space-around;*/
+/*    width: 100%;*/
+/*    margin-bottom: 20px;*/
+/*}*/
+.radio span{
+    font-size: 14px;
+}
+.radio {
+    margin-bottom: 20px;
+}
+.radioItem input{
+    width: auto;
+    margin: 10px;
+}
+
+.registerForm {
+    width: 100% !important;
+    margin-top: 10px!important;
+}
+

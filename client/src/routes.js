@@ -10,6 +10,9 @@ import Settings from "./components/Settings/Settings";
 import PupilMarks from "./components/Marks/PupilMarks";
 import {LeftSidebarTeacher} from "./components/Siders/LeftSidebarTeacher";
 import {SubjectTeacher} from "./components/Subjects/SubjectsTeacher";
+import InDevelopment from "./components/InDevelopment";
+import {LeftSidebarAdmin} from "./components/Siders/LeftSidebarAdmin";
+import Employee from "./components/Employee/Employee";
 
 
 export const generateRoutes = (isAuth, role) => {
@@ -23,6 +26,7 @@ export const generateRoutes = (isAuth, role) => {
                     <Route path="/myclass" element={<MyClass/>}/>
                     <Route path="/marks" element={<PupilMarks />}/>
                     <Route path="/settings" element={<Settings />}/>
+                    <Route path="/development" element={<InDevelopment />}/>
 
                 </Routes>
                 <RightSidebar />
@@ -38,7 +42,23 @@ export const generateRoutes = (isAuth, role) => {
                     <Route path="/marks" element={<TeacherMarks />}/>
                     <Route path="/settings" element={<Settings />}/>
                     <Route path="/subjects/:subjectId" element={<SubjectTeacher />}/>
-
+                    <Route path="/development" element={<InDevelopment />}/>
+                    <Route path="*" element={<Navigate to="/" />}/>
+                </Routes>
+                <RightSidebar />
+            </Layout>
+        )
+    } else if (isAuth && role === 'admin') { //role === admin
+        return (
+            <Layout style={{minHeight: '100vh'}}>
+                <LeftSidebarAdmin />
+                <Routes>
+                    <Route path="/" element={<DashboardContainer />}/>
+                    <Route path="/employee" element={<Employee />}/>
+                    <Route path="/marks" element={<TeacherMarks />}/>
+                    <Route path="/settings" element={<Settings />}/>
+                    <Route path="/subjects/:subjectId" element={<SubjectTeacher />}/>
+                    <Route path="/development" element={<InDevelopment />}/>
                     <Route path="*" element={<Navigate to="/" />}/>
                 </Routes>
                 <RightSidebar />

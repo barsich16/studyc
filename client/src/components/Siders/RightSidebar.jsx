@@ -14,8 +14,9 @@ export const RightSidebar = () => {
     return (
         <Routes>
             <Route path="/" element={<SidebarDashboard profile = {profile}/>}/>
+            <Route path="/settings" element={<SidebarDashboard profile = {profile}/>}/>
             <Route path="/myclass" element={<SidebarClass profile = {profile}/>}/>
-            <Route path="/subjects/:id" element={<SidebarDashboard profile = {profile}/>}/>
+            {/*<Route path="/subjects/:id" element={<SidebarDashboard profile = {profile}/>}/>*/}
         </Routes>
     )
 }

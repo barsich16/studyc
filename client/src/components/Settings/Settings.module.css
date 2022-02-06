@@ -1,1 +1,11 @@
+/*.form {*/
+/*    display: flex;*/
+/*    justify-content: space-around;*/
+/*    flex-wrap: wrap;*/
+/*}*/
+.form {
+    margin: 40px!important;
+    display: flex;
+    flex-direction: column;
 
+}
