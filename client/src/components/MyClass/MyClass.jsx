@@ -1,11 +1,8 @@
 import styles from "./MyClass.module.css";
 import {Layout, Tabs, Table} from "antd";
 import {useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
 import {connect} from "react-redux";
 import {getClass} from "../../redux/userReducer";
-import {getClassmatesSelector} from "../../redux/userSelector";
-import {useFetching} from "../../hooks/useFetching.hook";
 
 const {TabPane} = Tabs;
 
@@ -76,7 +73,7 @@ const data2 = [
 
 const {Header, Content} = Layout;
 const MyClass = ({getClass, classmates, role}) => {
-    const {fetching, loading} = useFetching();
+    // const {fetching, loading} = useFetching();
     // const dispatch = useDispatch();
     // const classmates = useSelector(getClassmatesSelector);
     // const role = useSelector(state => state.user.profile.role);

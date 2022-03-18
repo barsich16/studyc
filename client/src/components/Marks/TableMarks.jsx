@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
-import {Table, Input, Form, Button} from 'antd';
+import {Table, Input, Form, Button, Checkbox, Modal} from 'antd';
 import styles from './TeacherMarks.module.css'
 import {useFetching} from "../../hooks/useFetching.hook";
 
@@ -14,6 +14,16 @@ const EditableRow = ({index, ...props}) => {
         </Form>
     );
 };
+
+const sortRowBySurname = (a, b) => {
+    if (a.name < b.name) {
+        return -1
+    } else if (a.name > b.name)
+        return 1
+    else {
+        return 0
+    }
+}
 
 const EditableCell = ({
                           title,
@@ -73,7 +83,7 @@ const EditableCell = ({
             <div
                 className="editable-cell-value-wrap"
                 style={{
-                    minHeight: 20, minWidth: 30
+                    minHeight: 20,
                 }}
                 onClick={toggleEdit}
             >
@@ -82,9 +92,9 @@ const EditableCell = ({
         );
     }
 
-    return <td {...restProps}  className={editing ? styles.pad0 : styles.cells}>{childNode}</td>;
+    return <td {...restProps} className={editing ? styles.pad0 : styles.cells}>{childNode}</td>;
 };
-export const TableMarks = ({dataClass, dataClassName, updateMarks, statusMessage, setStatusMessage}) => {
+export const TableMarks = ({dataClass, dataClassName, updateMarks}) => {
     const columnsTemplate = [
         {
             title: '№',
@@ -92,16 +102,22 @@ export const TableMarks = ({dataClass, dataClassName, updateMarks, statusMessage
             key: 'id',
             fixed: 'left',
             align: 'center',
+            width: 30,
         },
         {
-            title: 'Прізвище Ім\'я По-батькові',
+            title: 'ПІБ учня',
             dataIndex: 'name',
             key: 'name',
             fixed: 'left',
+            sorter: sortRowBySurname,
             render: text => <a>{text}</a>,
-            // defaultSortOrder: 'ascend',
+            defaultSortOrder: 'ascend',
             // sorter: sortRowBySurname,
-            align: 'center'
+            align: 'left',
+            width: 250,
+            // ellipsis: {
+            //     showTitle: false,
+            // },
         },
         // {
         //     title: 'Результат',
@@ -111,16 +127,32 @@ export const TableMarks = ({dataClass, dataClassName, updateMarks, statusMessage
         //     align: 'center'
         // },
     ];
+    const [isHighlightMarksActive, setIsHighlightMarksActive] = useState(false);
+    const [visible, setVisible] = useState(false);
 
     const firstElement = dataClass[0];
     const neededKeys = Object.keys(firstElement).slice(3);
     const dynamicColumns = neededKeys.map((item, index) => {
         return {
             title: item,
-            key: index+'',
+            key: index + '',
             dataIndex: item,
             editable: true,
-            align: 'center'
+            align: 'center',
+            ellipsis: {
+                showTitle: false,
+            },
+            // textWrap: 'word-break',
+            width: 80,
+
+            render: (text) => {
+                if (text !== '' && isHighlightMarksActive) {
+                    return <div className={styles.highligtedMarks}>{text}</div>
+                } else {
+                    return <div>{text}</div>
+                }
+
+            },
         }
     });
 
@@ -140,6 +172,9 @@ export const TableMarks = ({dataClass, dataClassName, updateMarks, statusMessage
     const updateHandler = () => {
         const newMarks = localState;
         fetching(updateMarks, dataClassName, newMarks);
+    }
+    const highlightGivenMarks = e => {
+        setIsHighlightMarksActive(e.target.checked)
     }
     const components = {
         body: {
@@ -167,16 +202,46 @@ export const TableMarks = ({dataClass, dataClassName, updateMarks, statusMessage
 
     return (
         <>
+            <Checkbox onChange={highlightGivenMarks}>Виставлені оцінки</Checkbox>
+            <Button type="primary" onClick={() => setVisible(true)}>
+                Повноекранний режим
+            </Button>
             <Table
                 components={components}
-                rowClassName={() => 'editable-row'}
-                bordered
-                scroll={{x : 'max-content'}}
+                rowClassName={styles.rows}
+                bordered={true}
+                // scroll={{x : 'max-content'}}
+                scroll={{x: 1000}}
                 size='small'
-                pagination = {false}
+                pagination={false}
                 dataSource={localState}
                 columns={columns}
+                tableLayout={'fixed'}
             />
+            <Modal
+                title="Fullscreen"
+                centered
+                visible={visible}
+                onOk={() => setVisible(false)}
+                onCancel={() => setVisible(false)}
+                width={'100%'}
+                className={styles.modal}
+                bodyStyle={{padding: '10px 10px'}}
+            >
+                <Checkbox onChange={highlightGivenMarks}>Виставлені оцінки</Checkbox>
+                <Table
+                    components={components}
+                    rowClassName={styles.rows}
+                    bordered={true}
+                    // scroll={{x : 'max-content'}}
+                    scroll={{x: 1000}}
+                    // size='middle'
+                    pagination={false}
+                    dataSource={localState}
+                    columns={columns}
+                    tableLayout={'fixed'}
+                />
+            </Modal>
             <div className={styles.btn_wrap}>
                 <Button type="primary" onClick={updateHandler} loading={loading}>
                     Зберегти

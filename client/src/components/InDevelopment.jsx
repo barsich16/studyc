@@ -1,4 +1,3 @@
-import Loader from "./Loader";
 import {Layout, Spin} from "antd";
 const {Header, Content} = Layout
 

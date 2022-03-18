@@ -1,4 +1,5 @@
-import {teachAPI, userAPI} from "./apiRequests";
+import {userAPI} from "./apiRequests";
+import {getEmployees} from "./adminReducer";
 
 const storageName = 'userData';
 
@@ -119,14 +120,12 @@ export const register = (values) => {
 export const partLogin = (userId, token, role) => {
     return async dispatch => {
         try {
-            await dispatch(getProfile(token));
+            await dispatch(getProfile());
+            await dispatch(getEmployees());
             dispatch(setToken(token));
             dispatch(setUserId(userId));
             dispatch(setIsAuthenticated(true));
             dispatch(setRole(role));
-            localStorage.setItem(storageName, JSON.stringify({
-                userId, token, role
-            }));
             dispatch(setLoading(false));
             dispatch(setIsLoginizationFinished(true));
             return {notShow: true}
@@ -148,6 +147,9 @@ export const fullLogin = formValues => {       //Thunk Creator
         try {
             const dataLogin = await userAPI.login(formValues);
             const {userId, token, role} = dataLogin;
+            localStorage.setItem(storageName, JSON.stringify({
+                userId, token, role
+            }));
             dispatch(partLogin(userId, token, role));
             return {message: 'Вхід виконано'}
         } catch (e) {
@@ -157,10 +159,10 @@ export const fullLogin = formValues => {       //Thunk Creator
     };
 }
 
-export const getProfile = (token) => {
+export const getProfile = () => {
     return async dispatch => {
         try {
-            const profile = await userAPI.getProfile(token);
+            const profile = await userAPI.getProfile();
             dispatch(setProfile(profile));
         } catch (e) {
             throw e

@@ -14,5 +14,8 @@ module.exports = class ApiError extends Error {
     static BadRequest(message, errors = []) {
         return new ApiError(400, message, errors);
     }
+    static TokenExpiredError() {
+        return new ApiError(401, 'Термін дії токену вийшов');
+    }
 }
 

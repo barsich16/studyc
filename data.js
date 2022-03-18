@@ -163,7 +163,7 @@ const globalMarksArray = {
     '10-A Алгебра': [
         {
             key: '0',
-            name: 'Тестовий учень',
+            name: 'Teacherenko Teacher Teacherovych',
             id: 1,
             'Тема 1': 12,
             'Тема 2': 10,
@@ -295,7 +295,7 @@ const globalMarksArray = {
     '11-Б Українська мова': [
         {
             key: '0',
-            name: 'Тестовий учень',
+            name: 'Teacherenko Teacher Teacherovych',
             id: 1,
             'Тема 1': 12,
             'Диктант 1': 10,
@@ -417,7 +417,7 @@ const globalMarksArray = {
     '5-Б Інформатика': [
         {
             key: '0',
-            name: 'Тестовий учень',
+            name: 'Teacherenko Teacher Teacherovych',
             id: 1,
             'Практична 1': 12,
             'Практична 2': 10,

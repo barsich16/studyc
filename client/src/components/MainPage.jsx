@@ -1,10 +1,8 @@
 import {Button, Form, Input, Layout, Modal, Radio} from "antd";
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import styles from './MainPage.module.css'
-import {useHttp} from "../hooks/http.hook";
-import {useMessage} from "../hooks/messages.hook";
-import {connect, useDispatch} from "react-redux";
-import {fullLogin, login} from "../redux/userReducer";
+import {connect} from "react-redux";
+import {fullLogin} from "../redux/userReducer";
 import {EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined} from "@ant-design/icons";
 import {useFetching} from "../hooks/useFetching.hook";
 import {register} from "../redux/userReducer";
@@ -65,7 +63,13 @@ const Intro = ({register, fullLogin, createSchool}) => {
                 {/*<div className={styles.title}>Оцініть справжні переваги дистанційного навчання</div>*/}
             </Content>
             <Footer className={styles.footer}>footer</Footer>
-            <Modal onCancel={handleCancel} bodyStyle={{padding: 0}} width={768} footer={null} visible={isModalVisible}>
+            <Modal onCancel={handleCancel}
+                   bodyStyle={{padding: 0}}
+                   style={{}}
+                   width={768}
+                   footer={null}
+                   className= 'mainpage-modal'
+                   visible={isModalVisible}>
                 <div className={`${styles.container} ${isSelectedLogin ? "" : styles.rightPanelActive}`} id="container">
                     {/*реєстрація*/}
                     <div className={`${styles.formContainer} ${styles.signUpContainer}`}>

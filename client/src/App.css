@@ -85,10 +85,14 @@
   /*color: red;*/
   /*font-size: 14px;*/
 }
-.ant-modal-content {
+
+/*особлива модалка для mainpage*/
+.ant-modal.mainpage-modal .ant-modal-content {
   border-radius: 30px;
   background-color: transparent!important;
 }
+
+
 .ant-modal-close {
   z-index: 1001;
 }
@@ -153,3 +157,7 @@ input:-webkit-autofill {
   /*-webkit-text-fill-color: #999 !important; !* цвет текста *!*/
   color: #999 !important; /* цвет текста */
 }
+
+/*.ant-table-cell-row-hover {*/
+/*  background: #000;*/
+/*}*/

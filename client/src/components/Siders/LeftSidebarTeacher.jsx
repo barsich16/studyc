@@ -30,8 +30,10 @@ const SidebarTeacher = ({logout, getSubjects, subjects}) => {
         return <Loader />
     } else {
         const subjectItems = subjects.map((item, index) => {
+            const letter = item.class_letter ? `-${item.class_letter}` : '';
+            const title = `${item.class_name}${letter} ${item.name}`;
             return <Menu.Item key={`sub ${index}`}>
-                <Link to={`/subjects/${item.id}`}>{`${item.class.name} ${item.name}`}</Link>
+                <Link to={`/subjects/${item.id}`}>{title}</Link>
             </Menu.Item>
         });
         return (
@@ -74,7 +76,13 @@ const SidebarTeacher = ({logout, getSubjects, subjects}) => {
                     <Menu.Item key="6" icon={<UploadOutlined/>}>
                         <Link to="/settings">Налаштування</Link>
                     </Menu.Item>
-                    <Menu.Item onClick={logoutHandler} danger key="7" icon={<UploadOutlined/>}>
+                    <Menu.Item key="7" icon={<UserOutlined/>}>
+                        <Link to="/employee">Працівники</Link>
+                    </Menu.Item>
+                    <Menu.Item key="8" icon={<UserOutlined/>}>
+                        <Link to="/plans">Навчальні плани</Link>
+                    </Menu.Item>
+                    <Menu.Item onClick={logoutHandler} danger key="9" icon={<UploadOutlined/>}>
                         <Link style={{color: '#ff4d4f'}} to="/">Вихід</Link>
                     </Menu.Item>
                 </Menu>

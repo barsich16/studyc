@@ -1,8 +1,17 @@
 .title {
-    margin: 20px;
+    margin-bottom: 30px;
     font-size: 35px;
 }
 .form {
-    margin: 40px!important;
+    margin: 20px 10px 0!important;
     /*width: 800px!important;*/
+}
+.btn_wrap{
+    /*display: flex;*/
+    /*justify-content: right;*/
+    /*text-align: right;*/
+    margin-left: 15px;
+}
+.table {
+    margin-left: 15px;
 }

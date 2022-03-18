@@ -11,6 +11,7 @@ module.exports = (req, res, next) => {
         if (!token) {
             throw ApiError.UnauthorizedError();
         }
+        console.log(token);
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         // const cook = req.cookies.token;
         //console.log("Куки: ", cook );
@@ -18,6 +19,9 @@ module.exports = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (e) {
+        if (e.message === 'jwt expired') {
+            throw ApiError.TokenExpiredError();
+        }
         next(e)
         //res.status(401).json({ JWTExpired: true, message: 'Термін дії токену вийшов'});
     }

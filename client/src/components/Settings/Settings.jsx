@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import {Avatar, Layout} from 'antd';
-import {UserOutlined} from "@ant-design/icons";
+import {Layout} from 'antd';
 import styles from "./Settings.module.css"
 import {Form, Input, Select, Button,} from 'antd';
 import {connect} from "react-redux";

@@ -1,4 +1,9 @@
-.tabsContainer table td:nth-child(1), .tabsContainer table td:nth-child(2),.tabsContainer table td:last-child{
+.tabsContainer table td:nth-child(1),
+.tabsContainer table td:nth-child(2),
+.tabsContainer table td:last-child,
+.modal table td:last-child,
+.modal table td:nth-child(1),
+.modal table td:nth-child(2) {
     background-color: #ebebf1;
     z-index: 2;
 }
@@ -10,6 +15,32 @@
 /*}*/
 .cells {
     padding: 2px!important;
+}
+.input {
+
+}
+/*.cells:hover {*/
+/*    !*background: #03094e!important;*!*/
+/*}*/
+/*.rows {*/
+/*    background: #eeeeee!important;*/
+/*}*/
+
+/*виділення строки в журналі*/
+.highligtedMarks {
+    background-color: forestgreen;
+    /*border-right: 1px solid rgba(240, 240, 240, .5) !important;*/
+    margin: -2px;
+}
+.rows:hover > td {
+    background: #1868a7 !important;
+    /*border-right: 1px solid rgba(240, 240, 240, .2) !important;*/
+    border-right-color: rgba(240, 240, 240, .1)!important;
+}
+.rows > td {
+    transition: background 0.3s!important;
+    transition: border 0.01s!important;
+    border-right: 1px solid rgba(240, 240, 240, .5) !important;
 }
 .pad0 {
     padding: 0px!important;

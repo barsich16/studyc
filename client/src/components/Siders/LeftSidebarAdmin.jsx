@@ -5,11 +5,8 @@ import {MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, UserOutlined} from
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {logout} from "../../redux/userReducer";
-import {getSubjects} from "../../redux/teacherReducer";
-import Loader from "../Loader";
 
 const {Sider} = Layout;
-const { SubMenu } = Menu;
 
 const SidebarTeacher = ({logout, }) => {
     let [collapsed, setCollapsed] = useState(false);
@@ -41,7 +38,7 @@ const SidebarTeacher = ({logout, }) => {
                         ? <MenuUnfoldOutlined className={styles.trigger} onClick={() => {
                             setCollapsed(!collapsed)
                         }}/>
-                        : <MenuFoldOutlined className={styles.trigger} onClick={() => {
+                        : <MenuFoldOutlined key='10' className={styles.trigger} onClick={() => {
                             setCollapsed(!collapsed)
                         }}/>
                     }
@@ -59,15 +56,18 @@ const SidebarTeacher = ({logout, }) => {
                         <Link to="/employee">Працівники</Link>
                     </Menu.Item>
                     <Menu.Item key="5" icon={<UserOutlined/>}>
-                        <Link to="/load">Навантаження</Link>
+                        <Link to="/classes">Класи</Link>
                     </Menu.Item>
-                    <Menu.Item key="6" icon={<UploadOutlined/>}>
-                        <Link to="/development">Розклад</Link>
+                    <Menu.Item key="6" icon={<UserOutlined/>}>
+                        <Link to="/appointment">Навантаження</Link>
                     </Menu.Item>
                     <Menu.Item key="7" icon={<UploadOutlined/>}>
+                        <Link to="/schedule">Розклад</Link>
+                    </Menu.Item>
+                    <Menu.Item key="8" icon={<UploadOutlined/>}>
                         <Link to="/settings">Налаштування</Link>
                     </Menu.Item>
-                    <Menu.Item onClick={logoutHandler} danger key="8" icon={<UploadOutlined/>}>
+                    <Menu.Item onClick={logoutHandler} danger key="9" icon={<UploadOutlined/>}>
                         <Link style={{color: '#ff4d4f'}} to="/">Вихід</Link>
                     </Menu.Item>
                 </Menu>

@@ -1,0 +1,10 @@
+export const SET_MARKS = 'SET_MARKS';
+export const LOADING = 'LOADING';
+export const SET_STATUS_MESSAGE = 'SET_STATUS_MESSAGE';
+export const SET_SUBJECTS = 'SET_SUBJECTS';
+export const SET_TYPES = 'SET_TYPES';
+export const SET_PLANS = 'SET_PLANS';
+export const ADD_NEW_PLAN = 'ADD_NEW_PLAN';
+export const DELETE_PLAN = 'DELETE_PLAN';
+export const CHANGE_PLAN = 'CHANGE_PLAN';
+export const UPDATE_SUBJECT = 'UPDATE_SUBJECT';

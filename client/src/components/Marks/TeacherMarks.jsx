@@ -1,14 +1,14 @@
 import styles from "./TeacherMarks.module.css";
 import {Layout, Tabs} from "antd";
 import {TableMarks} from "./TableMarks";
-import {getMarks, setStatusMessage, updateMarks} from "../../redux/teacherReducer";
+import {getMarks, updateMarks} from "../../redux/teacherReducer";
 import {connect} from "react-redux";
 import Loader from "../Loader";
 import React, {useEffect} from "react";
 const {Header, Content} = Layout;
 const {TabPane} = Tabs;
 
-const TeacherMarks = ({globalMarksArray, getMarks, updateMarks, setStatusMessage, statusMessage}) => {
+const TeacherMarks = ({globalMarksArray, getMarks, updateMarks, statusMessage}) => {
     function callback(key) {
         console.log(key);
     }
@@ -27,7 +27,6 @@ const TeacherMarks = ({globalMarksArray, getMarks, updateMarks, setStatusMessage
             <TabPane tab={item} key={index}>
                 <TableMarks dataClass={globalMarksArray[item]}
                             dataClassName={item} updateMarks={updateMarks}
-                            setStatusMessage={setStatusMessage}
                             statusMessage={statusMessage}
                 />
             </TabPane>
@@ -54,5 +53,5 @@ const mapState = state => ({
     globalMarksArray: state.teacher.marks,
     statusMessage: state.teacher.statusMessage
 })
-export default connect(mapState, {getMarks, updateMarks, setStatusMessage})(TeacherMarks)
+export default connect(mapState, {getMarks, updateMarks})(TeacherMarks)
 
