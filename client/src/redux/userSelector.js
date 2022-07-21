@@ -1,5 +1,3 @@
-//import {createSelector} from "reselect";
-
 export const getIsAuthenticatedSelector = state => {
     return state.user.isAuthenticated;
 }
@@ -9,7 +7,6 @@ export const getTokenSelector = state => {
 export const getIsTokenExpiredSelector = state => {
     return state.user.isTokenExpired;
 }
-
 export const getProfileSelector = state => {
     return state.user.profile;
 }
@@ -19,4 +16,3 @@ export const getClassTeacherSelector = state => {
 export const getClassmatesSelector = state => {
     return state.user.classmates;
 }
-

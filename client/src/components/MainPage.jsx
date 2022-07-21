@@ -11,12 +11,7 @@ import {createSchool} from "../redux/adminReducer";
 const {Header, Footer, Content} = Layout;
 
 const Intro = ({register, fullLogin, createSchool}) => {
-    // const onFinishFailed = (errorInfo) => {
-    //     console.log('Failed:', errorInfo);
-    // };
-    // const dispatch = useDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
-
     const [isSelectedLogin, setIsSelectedLogin] = useState(false);
     const [isSelectedCreating, setIsSelectedCreating] = useState(false);
 
@@ -34,9 +29,7 @@ const Intro = ({register, fullLogin, createSchool}) => {
         setIsModalVisible(true);
         setIsSelectedCreating(true);
     };
-    // const handleOk = () => {
-    //     setIsModalVisible(false);
-    // };
+
     const handleCancel = () => {
         setIsModalVisible(false);
     };
@@ -44,7 +37,9 @@ const Intro = ({register, fullLogin, createSchool}) => {
     return (
         <Layout className={styles.layout}>
             <Header className={styles.header}>
-                <span className={styles.logo}>Logo</span>
+                <span className={styles.logo}>
+                    Studyc
+                </span>
                 <div className="loginButtons">
                     <Button type="primary" size={'large'} onClick={showModalFromLogin} className={styles.headerButton}>
                         Вхід
@@ -57,11 +52,8 @@ const Intro = ({register, fullLogin, createSchool}) => {
                         Створити школу
                     </Button>
                 </div>
-
             </Header>
-            <Content className={styles.content}>
-                {/*<div className={styles.title}>Оцініть справжні переваги дистанційного навчання</div>*/}
-            </Content>
+            <Content className={styles.content} />
             <Footer className={styles.footer}>footer</Footer>
             <Modal onCancel={handleCancel}
                    bodyStyle={{padding: 0}}
@@ -121,18 +113,14 @@ const SchoolForm = ({createSchool}) => {
     const {fetching} = useFetching();
 
     const creatingSchoolHandler = (values) => {
-        console.log('Success Creating school:', values);
         fetching(createSchool, values);
-        // fetching(fullLogin, values);
     };
 
     return <div className={styles.formInner}>
         <h1>Створити школу</h1>
-
         <Form
             name="creatingSchool"
             className={`${styles.registerForm} formreg`}
-            // size='large'
             labelCol={{
                 span: 10,
             }}
@@ -140,9 +128,6 @@ const SchoolForm = ({createSchool}) => {
                 span: 25,
             }}
             onFinish={creatingSchoolHandler}
-            // initialValues={{
-            //     role: 'pupil'
-            // }}
         >
             <Form.Item
                 name="email"
@@ -193,7 +178,6 @@ const SchoolForm = ({createSchool}) => {
 
             <Form.Item
                 name="schoolRegion"
-                // rules={[ {required: true, message: 'Введіть назву школи'} ]}
             >
                 <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="Населений пункт"/>
             </Form.Item>
@@ -206,33 +190,24 @@ const SchoolForm = ({createSchool}) => {
         </Form>
     </div>
 }
+
 const RegistrationForm = ({register}) => {
     const {fetching} = useFetching();
     const [radioValue, setRadioValue] = useState('pupil');
 
     const onRadioChange = e => {
-        console.log('radio checked', e.target.value);
         setRadioValue(e.target.value);
     };
 
     const registerHandler = (values) => {
-        console.log('Success Registration:', values);
         fetching(register, values);
     };
 
     return <div className={styles.formInner}>
         <h1>Створити аккаунт</h1>
-        {/*<input type="text" onChange={changeRegistrationHandler} name='name' placeholder="Ім'я"/>*/}
-        {/*<input type="email"  name='email' onChange={changeRegistrationHandler} placeholder="Email"/>*/}
-        {/*<Input type='email' placeholder="Basic usage" />*/}
-        {/*<input type="password" name='password' onChange={changeRegistrationHandler} placeholder="Пароль"/>*/}
-        {/*<input type="text" disabled={radioValue === 2} onChange={changeRegistrationHandler} name='code' placeholder="Код класу"/>*/}
-
-
         <Form
             name="registration"
             className={`${styles.registerForm} formreg`}
-            // size='large'
             labelCol={{
                 span: 10,
             }}
@@ -240,7 +215,6 @@ const RegistrationForm = ({register}) => {
                 span: 25,
             }}
             onFinish={registerHandler}
-            // onFinishFailed={onFinishFailed}
             initialValues={{
                 role: 'pupil'
             }}
@@ -289,7 +263,6 @@ const RegistrationForm = ({register}) => {
                 <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="Ім'я"/>
             </Form.Item>
 
-
             <Form.Item name="role">
                 <Radio.Group onChange={onRadioChange} value={radioValue}>
                     <Radio value={'pupil'}>Учень</Radio>
@@ -326,11 +299,10 @@ const RegistrationForm = ({register}) => {
 
     </div>
 }
-const LoginForm = ({login}) => {
 
+const LoginForm = ({login}) => {
     const {fetching} = useFetching();
     const loginHandler = (values) => {
-        console.log('Success Login:', values);
         fetching(login, values);
     };
 
@@ -348,13 +320,11 @@ const LoginForm = ({login}) => {
                 span: 25,
             }}
             onFinish={loginHandler}
-            // onFinishFailed={onFinishFailed}
         >
             <Form.Item
                 name="email"
                 rules={[
                     {required: true, message: 'Введіть ваш email'},
-                    // { type: 'email', message: 'Некоректний email' },
                 ]}
             >
                 <Input prefix={<UserOutlined className="site-form-item-icon"/>}
@@ -380,12 +350,6 @@ const LoginForm = ({login}) => {
                 </Button>
             </Form.Item>
         </Form>
-
-
-        {/*<input type="email" onChange={changeLoginHandler} name='email' placeholder="Email"/>*/}
-        {/*<input type="password" onChange={changeLoginHandler} name='password' placeholder="Пароль"/>*/}
-        {/*<button onClick={loginHandler} disabled={onRequest}>Увійти</button>*/}
     </div>
 }
 export const MainPage = connect(null, {register, fullLogin, createSchool})(Intro)
-

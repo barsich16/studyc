@@ -1,40 +1,47 @@
-.tabsContainer table td:nth-child(1),
-.tabsContainer table td:nth-child(2),
-.tabsContainer table td:last-child,
-.modal table td:last-child,
+.marksTab table td:nth-child(1),
+.marksTab table td:nth-child(2),
 .modal table td:nth-child(1),
 .modal table td:nth-child(2) {
     background-color: #ebebf1;
     z-index: 2;
 }
-.tabsContainer {
-    padding: 20px;
+/*річна*/
+.marksTab table td:nth-child(5),
+.modal table td:nth-child(5) {
+    background-color: #9aabfd;
+    z-index: 2;
 }
-/*.siteLayout .siteLayoutBackground {*/
-/*    background: #dd1414;*/
-/*}*/
+/*семестр1*/
+.marksTab table td:nth-child(4),
+.modal table td:nth-child(4) {
+    background-color: #b3d8f1;
+    z-index: 2;
+}
+.marksTab table td:nth-child(3),
+.modal table td:nth-child(3) {
+    background-color: #90caf1;
+    color: red;
+    font-weight: 500;
+    z-index: 2;
+}
+.tabsContainer {
+    padding: 10px 20px 20px;
+}
+
 .cells {
     padding: 2px!important;
 }
-.input {
-
-}
-/*.cells:hover {*/
-/*    !*background: #03094e!important;*!*/
-/*}*/
-/*.rows {*/
-/*    background: #eeeeee!important;*/
-/*}*/
 
 /*виділення строки в журналі*/
-.highligtedMarks {
-    background-color: forestgreen;
-    /*border-right: 1px solid rgba(240, 240, 240, .5) !important;*/
+.highlightedMarks {
+    background-color: rgba(34,139,34, 1);
     margin: -2px;
+}
+.pupilName {
+    width: 190px!important;
 }
 .rows:hover > td {
     background: #1868a7 !important;
-    /*border-right: 1px solid rgba(240, 240, 240, .2) !important;*/
     border-right-color: rgba(240, 240, 240, .1)!important;
 }
 .rows > td {
@@ -45,15 +52,42 @@
 .pad0 {
     padding: 0px!important;
 }
-/*.input{*/
-/*    max-height: 10px!important;*/
-/*}*/
+
 .btn_wrap {
     display: flex;
     justify-content: right;
     margin-top: 20px;
 }
 .tableWrapper {
-    width: 30%;
-    margin: 10px;
+    width: 55%;
+    margin-right: 30px;
+    border: 1px solid #eee;
+}
+.tableWrapper tr:nth-child(even) {
+    background-color: #F7F7F7;
+}
+.tableWrapper tr:nth-child(-n+3) {
+    font-weight: 700;
+}
+.tableWrapper thead th {
+    font-size: 15px;
+}
+.wrapper {
+    display: flex;
+    align-items: flex-start;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.rightSider {
+    border-left: 2px rgb(224, 224, 224) solid;
+    overflow: hidden;
+    height: 100vh;
+    position: sticky!important;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }

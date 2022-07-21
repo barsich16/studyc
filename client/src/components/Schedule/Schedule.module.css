@@ -4,3 +4,7 @@
 .siteLayout .siteLayoutBackground {
     background: #fff;
 }
+.lessonInfo {
+    width: 100%;
+    min-height: 55px;
+}

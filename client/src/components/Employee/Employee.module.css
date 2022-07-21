@@ -4,6 +4,9 @@
 .tabsContainer {
     padding: 20px;
 }
+.btn {
+    padding: 0!important;
+}
 .btn_wrap {
     display: flex;
     justify-content: right;

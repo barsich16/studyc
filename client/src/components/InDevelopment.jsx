@@ -11,13 +11,9 @@ const InDevelopment = () => {
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap'}}>
                         <Spin style={{margin: '0 auto'}} size="large" />
                     </div>
-
                 </div>
-
             </Content>
         </Layout>
-
-
     );
 }
 

@@ -24,7 +24,7 @@ const formItemLayout = {
 const Settings = ({updateProfile, profile}) => {
     const [form] = Form.useForm();
     const {fetching} = useFetching();
-    console.log("Profile:", profile);
+
     const initialValues = {
         surname: profile.surname || '',
         name: profile.name || '',
@@ -34,7 +34,6 @@ const Settings = ({updateProfile, profile}) => {
         gender: profile.gender || ''
     }
     const [isPasswordEntered, setIsPasswordEntered] = useState(false);
-
 
     const onFinish = (values) => {
         values.phone = '+380' + values.phone;
@@ -58,34 +57,19 @@ const Settings = ({updateProfile, profile}) => {
                     scrollToFirstError
                     className={styles.form}
                 >
-                    {/*<Avatar size={64} icon={<UserOutlined/>}/>*/}
-                    {/*<Form.Item label="Клас">*/}
-                    {/*    <span className="ant-form-text">10-A</span>*/}
-                    {/*</Form.Item>*/}
-                    <Form.Item
-                        name="surname"
-                        label="Прізвище"
-                    >
+                    <Form.Item name="surname" label="Прізвище" >
                         <Input/>
                     </Form.Item>
 
-                    <Form.Item
-                        name="name"
-                        label="Ім'я"
-                    >
-                        <Input/>
-                    </Form.Item>
-                    <Form.Item
-                        name="patronymic"
-                        label="По батькові"
-                    >
+                    <Form.Item name="name" label="Ім'я" >
                         <Input/>
                     </Form.Item>
 
-                    <Form.Item
-                        name="gender"
-                        label="Стать"
-                    >
+                    <Form.Item name="patronymic" label="По батькові" >
+                        <Input/>
+                    </Form.Item>
+
+                    <Form.Item name="gender" label="Стать" >
                         <Select placeholder="оберіть свою стать">
                             <Option value="male">Чоловіча</Option>
                             <Option value="female">Жіноча</Option>
@@ -101,6 +85,7 @@ const Settings = ({updateProfile, profile}) => {
                     >
                         <Input/>
                     </Form.Item>
+
                     <Form.Item
                         onChange={changePass}
                         name="password"
@@ -129,7 +114,6 @@ const Settings = ({updateProfile, profile}) => {
                                     if (!value || getFieldValue('password') === value) {
                                         return Promise.resolve();
                                     }
-
                                     return Promise.reject(new Error('Паролі не співпадають!'));
                                 },
                             }),
@@ -137,22 +121,12 @@ const Settings = ({updateProfile, profile}) => {
                     >
                         <Input.Password/>
                     </Form.Item>
-                    <Form.Item
-                        name="phone"
-                        label="Номер телефону"
-                    >
-                        <Input
-                            addonBefore="+380"
-                            style={{
-                                width: '100%',
-                            }}
-                        />
+
+                    <Form.Item name="phone" label="Номер телефону" >
+                        <Input style={{ width: '100%' }} />
                     </Form.Item>
 
-                    <Form.Item
-                        name="intro"
-                        label="Додаткова інформація"
-                    >
+                    <Form.Item name="intro" label="Додаткова інформація" >
                         <Input.TextArea maxLength={100}/>
                     </Form.Item>
 

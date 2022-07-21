@@ -35,19 +35,8 @@ export const userAPI = {
                         console.log(error);
                     }
                 });
+
             return response;
-            // const response = await fetch('http://localhost:3000/api/auth/login', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify(values)
-            // });
-            // const data = await response.json();
-            // if (!response.ok) {
-            //     throw new Error(data.message || 'Щось не так')
-            // }
-            // return data;
         } catch (e) {
             throw e;
         }
@@ -70,25 +59,50 @@ export const userAPI = {
         }
 
     },
-    async getClass(token, classId) {
-        const response = await fetch(`api/user/class/${classId}`, {
-            // headers: {
-            //     Authorization: `Bearer ${token}`
-            // }
-        });
-        const responseJSON = await response.json();
-        if (responseJSON.JWTExpired) {
-            throw new Error(responseJSON.message)
+    async getClass() {
+        try {
+            const resp = $authHost.get(`/api/user/class`)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            return resp;
         }
-        return responseJSON;
+        catch (e) {
+            throw e
+        }
     },
-    async getMarks(userId) {
-        const response = await fetch(`api/user/marks/${userId}`);
-        return await response.json();
+    async getAllMarks(userId) {
+        const resp = $authHost.get(`/api/user/marks/${userId}`)
+            .then(response => response.data)
+            .catch(error => {
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                } else {
+                    console.log(error);
+                }
+            });
+        return resp;
+    },
+    async getMarks(userId, subjectId) {
+        const resp = $authHost.get(`/api/user/marks/${userId}/${subjectId}`)
+            .then(response => response.data)
+            .catch(error => {
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                } else {
+                    console.log(error);
+                }
+            });
+        return resp;
+
     },
     async updateProfileInfo(token, updatedProfileInfo) {
         try {
-            console.log(updatedProfileInfo);
             const response = await fetch(`http://localhost:3000/api/user/profile`, {
                 method: 'PUT',
                 body: JSON.stringify(updatedProfileInfo),
@@ -103,36 +117,86 @@ export const userAPI = {
             }
             return data;
         } catch (e) {
-            console.log(e);
+            throw e;
+        }
+    },
+    async getSchedule(classId) {
+        try {
+            const response = $authHost.get(`/api/user/schedule/${classId}`)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+
+            return response;
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async getMySchedule() {
+        try {
+            const response = $authHost.get(`/api/user/schedule`)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+
+            return response;
+        } catch (e) {
             throw e;
         }
     },
 }
 
 export const teachAPI = {
-    async getMarks(userId) {
-        const response = await fetch(`api/teach/marks/${userId}`);
-        return await response.json();
-    },
-    async updateMark(token, subjectName, newMarks) {
-        try {
-            console.log("HERE");
-            const obj = {subjectName, newMarks};
-            const response = await fetch(`api/teach/marks/update`, {
-                method: 'PUT',
-                body: JSON.stringify(obj),
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+    async getMarks(subjectId) {
+        const resp = $authHost.get(`/api/teach/marks/${subjectId}`)
+            .then(response => response.data)
+            .catch(error => {
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                } else {
+                    console.log(error);
                 }
             });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Щось не так')
-            }
-            return data;
+        return resp;
+    },
+
+    async getTypesEvents() {
+        const resp = $authHost.get(`/api/teach/typesEvents`)
+            .then(response => response.data)
+            .catch(error => {
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                } else {
+                    console.log(error);
+                }
+            });
+        return resp;
+    },
+
+    async updateMark(changedMarks) {
+        try {
+            const response = $authHost.put('/api/teach/marks', changedMarks)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            return response;
         } catch (e) {
-            console.log(e);
             throw e;
         }
     },
@@ -168,20 +232,8 @@ export const teachAPI = {
                         console.log(error);
                     }
                 });
+
             return response;
-            // const response = await fetch(`http://localhost:3000/api/teach/subjects`, {
-            //     method: 'PUT',
-            //     body: JSON.stringify(newSubjectInfo),
-            //     headers: {
-            //         Authorization: `Bearer ${token}`,
-            //         'Content-Type': 'application/json'
-            //     }
-            // });
-            // const data = await response.json();
-            // if (!response.ok) {
-            //     throw new Error(data.message || 'Щось не так')
-            // }
-            // return data;
         } catch (e) {
             console.log(e);
             throw e;
@@ -200,7 +252,6 @@ export const teachAPI = {
                 });
             return response;
         } catch (e) {
-            console.log(e);
             throw e;
         }
     },
@@ -225,7 +276,6 @@ export const teachAPI = {
 export const adminAPI = {
     async createSchool(newSchoolInfo) {
         try {
-            console.log('даров')
             const response = await fetch('http://localhost:3000/api/auth/createSchool', {
                 method: 'POST',
                 headers: {
@@ -242,23 +292,92 @@ export const adminAPI = {
             throw e;
         }
     },
+    
     async createClass(newClassInfo) {
-        return $authHost.post('/api/admin/classes', newClassInfo)
-            .then(response => response.data)
-            .catch(error => {
-                if (error.response) {
-                    throw new Error(error.response.data.message);
-                } else {
-                    console.log(error);
-                }
-            });
+        try {
+            const response = $authHost.post('/api/admin/classes', newClassInfo)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            return response;
+        } catch (e) {
+            throw e;
+        }
     },
+    
+    async appointClassTeacher(classId, teacherId) {
+        try {
+            const response = $authHost.put('/api/admin/classTeacher', {classId, teacherId})
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            return response;
+        } catch (e) {
+            throw e;
+        }
+    },
+    
+    async updateSchedule(newSchedule) {
+        try {
+            const response = $authHost.put(`/api/admin/schedule`, newSchedule)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            return response;
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+    },
+
+    async updateAppointment(changedSubjects) {
+        try {
+            const response = $authHost.put('/api/admin/appointment', changedSubjects)
+                .then(response => response.data)
+                .catch(error => {
+                    if (error.response) {
+                        throw new Error(error.response.data.message);
+                    } else {
+                        console.log(error);
+                    }
+                });
+            return response;
+        } catch (e) {
+            throw e;
+        }
+    },
+    
     async getEmployees() {
         return $authHost.get('/api/admin/employees').then(response => response.data)
     },
+
     async getClasses() {
         return $authHost.get('/api/admin/classes').then(response => response.data)
     },
+
+    async getAppointment(classId) {
+        return $authHost.get(`/api/admin/appointment/${classId}`).then(response => response.data);
+    },
+
+    async getAllClassSubjects(classId, year) {
+        return $authHost.get(`/api/admin/classes/${classId}/${year}`).then(response => response.data);
+    },
+
     async changeState(employees_id, newState) {
         return $authHost.put('/api/admin/changeState', {id: employees_id, state: newState})
             .then(response => response.data)
@@ -270,6 +389,7 @@ export const adminAPI = {
                 }
             });
     },
+
     async changeEmployeeRole(employees_id, newRole) {
         return $authHost.put('/api/admin/roleEmployees', {id: employees_id, role: newRole})
             .then(response => response.data)
@@ -280,6 +400,17 @@ export const adminAPI = {
                     console.log(error);
                 }
             });
-    }
+    },
 
+    async moveToNextYear(withSubjects) {
+        return $authHost.put('/api/admin/changeYear', {withSubjects})
+            .then(response => response.data)
+            .catch(error => {
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                } else {
+                    console.log(error);
+                }
+            });
+    },
 }

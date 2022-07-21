@@ -1,22 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-//import '@atlaskit/css-reset';
 import styled from 'styled-components';
 import { DragDropContext } from 'react-beautiful-dnd';
-import initialData from './initial-data';
 import Column, {MainColumn} from './column';
+import {Button} from "antd";
 
-const Container = styled.div`
+export const ScheduleContainer = styled.div`
   display: flex;
   justify-content: space-between;
 `;
 
 export default class Board extends React.Component {
-    state = initialData;
+    initialData = this.props.initialData;
+    state = this.initialData;
 
     onDragStart = start => {
         const homeIndex = this.state.columnOrder.indexOf(start.source.droppableId);
-        // console.log('newState: ', this.state)
         this.setState({
             homeIndex,
         });
@@ -27,9 +25,8 @@ export default class Board extends React.Component {
             homeIndex: null,
         });
 
-        const { destination, source, draggableId } = result;
-        console.log(this.state);
-
+        let { destination, source, draggableId } = result;
+        console.log(result);
         if (!destination) {
             return;
         }
@@ -43,17 +40,20 @@ export default class Board extends React.Component {
 
         const home = this.state.columns[source.droppableId];
         const foreign = this.state.columns[destination.droppableId];
-        //console.log(home);
-        //console.log(foreign);
 
-        if (home === foreign) {
+        if (home === foreign) {  // moving among one list
             const newTaskIds = Array.from(home.taskIds);
+            const newSubjectIds = Array.from(home.subjectIds);
+
             newTaskIds.splice(source.index, 1);
+            const deletedSubjectId = newSubjectIds.splice(source.index, 1);
             newTaskIds.splice(destination.index, 0, draggableId);
+            newSubjectIds.splice(destination.index, 0, ...deletedSubjectId);
 
             const newHome = {
                 ...home,
                 taskIds: newTaskIds,
+                subjectIds: newSubjectIds
             };
 
             const newState = {
@@ -70,28 +70,28 @@ export default class Board extends React.Component {
 
         // moving from one list to another
         const homeTaskIds = Array.from(home.taskIds);
-        // console.log(Object.keys(initialData.tasks));
-        const initialLength = +Object.keys(initialData.tasks).length + 1;
-        //console.log(initialLength);
-        const newItem = 'task-' + initialLength;
-        //console.log(initialLength);
-        initialData.tasks[newItem] = {...initialData.tasks[draggableId], id: newItem};
-        // initialData.tasks['task-' + initialLength] = {...initialData.tasks[draggableId], id: 'task-' + initialLength};
+        const initialLength = +Object.keys(this.initialData.tasks).length + 1;
 
-        //initialData.tasks;
+        this.initialData.tasks['task-' + initialLength] = {...this.initialData.tasks[draggableId], id: 'task-' + initialLength};
+        const subj = this.initialData.tasks[draggableId].subjectId;
 
-        homeTaskIds.splice(source.index, 1, newItem);
-        //console.log(homeTaskIds);
+        homeTaskIds.splice(source.index, 1, 'task-' + initialLength);
         const newHome = {
             ...home,
             taskIds: homeTaskIds,
         };
 
         const foreignTaskIds = Array.from(foreign.taskIds);
-        foreignTaskIds.splice(destination.index, 0, draggableId);
+        const foreignSubjectIds = Array.from(foreign.subjectIds);
+        if (foreign.id !== 'column-6') {
+            foreignTaskIds.splice(destination.index, 0, draggableId);
+            foreignSubjectIds.splice(destination.index, 0, typeof subj === 'string' ? +subj : subj);
+        }
+
         const newForeign = {
             ...foreign,
             taskIds: foreignTaskIds,
+            subjectIds: foreignSubjectIds
         };
 
         const newState = {
@@ -105,51 +105,74 @@ export default class Board extends React.Component {
         this.setState(newState);
     };
 
+    deleteTask = (column, itemIndex) => {
+        column.taskIds.splice(itemIndex, 1);
+        const filteredSubjectId = column.subjectIds.filter((item, index) => index !== itemIndex);
+
+        const newState = {
+            ...this.state,
+            columns: {
+                ...this.state.columns,
+                [column.id]: {...column, subjectIds: filteredSubjectId},
+            },
+        };
+
+        this.setState(newState);
+    }
+
     render() {
         return (
-            <DragDropContext
-                onDragStart={this.onDragStart}
-                onDragEnd={this.onDragEnd}
-            >
-                <Container>
-                    {this.state.columnOrder.map((columnId, index) => {
-                        const column = this.state.columns[columnId];
-                        const tasks = column.taskIds.map(
-                            taskId => this.state.tasks[taskId],
-                        );
+            <>
+                <DragDropContext
+                    onDragStart={this.onDragStart}
+                    onDragEnd={this.onDragEnd}
+                >
+                    <ScheduleContainer>
+                        {this.state.columnOrder.map(columnId => {
+                            const column = this.state.columns[columnId];
+                            const tasks = column.taskIds.map(
+                                taskId => this.state.tasks[taskId],
+                            );
 
-                        const isDropDisabled = false;
+                            const isDropDisabled = false;
 
-                        return (
-                            <Column
-                                key={column.id}
-                                column={column}
-                                tasks={tasks}
-                                isDropDisabled={isDropDisabled}
-                            />
-                        );
-                    })}
-                </Container>
-                <div>
-                    {this.state.mainColumn.map((columnId, index) => {
-                        const column = this.state.columns[columnId];
-                        const tasks = column.taskIds.map(
-                            taskId => this.state.tasks[taskId],
-                        );
+                            return (
+                                <Column
+                                    key={column.id}
+                                    column={column}
+                                    tasks={tasks}
+                                    deleteElement={this.deleteTask}
+                                    isDropDisabled={isDropDisabled}
+                                />
+                            );
+                        })}
+                    </ScheduleContainer>
+                    <div>
+                        {this.state.mainColumn.map(columnId => {
+                            const column = this.state.columns[columnId];
+                            const tasks = column.taskIds.map(
+                                taskId => this.state.tasks[taskId],
+                            );
 
-                        const isDropDisabled = false;
+                            const isDropDisabled = false;
 
-                        return (
-                            <MainColumn
-                                key={column.id}
-                                column={column}
-                                tasks={tasks}
-                                isDropDisabled={isDropDisabled}
-                            />
-                        );
-                    })}
+                            return (
+                                <MainColumn
+                                    key={column.id}
+                                    column={column}
+                                    tasks={tasks}
+                                    isDropDisabled={isDropDisabled}
+                                />
+                            );
+                        })}
+                    </div>
+                </DragDropContext>
+                <div style={{display: 'flex', justifyContent: 'end', marginTop: 20}}>
+                    <Button
+                        type='primary'
+                        onClick={() => this.props.updateSchedule(this.state.columns)}>Зберегти</Button>
                 </div>
-            </DragDropContext>
+            </>
         );
     }
 }

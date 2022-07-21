@@ -1,24 +1,16 @@
-import {connect, useDispatch, useSelector} from "react-redux";
-import {useParams} from "react-router-dom";
+import {useSelector} from "react-redux";
 import Loader from "../Loader";
-import {Layout, Form, Input, Button, Space, Select, Table} from 'antd';
-import {
-    ArrowDownOutlined,
-    ArrowUpOutlined,
-    MinusCircleOutlined,
-    PlusOutlined,
-} from '@ant-design/icons';
+import {Form, Input, Button, Select, Table} from 'antd';
 import styles from "./Subjects.module.css";
 import React, {useEffect, useState} from "react";
-import {getPlans, updateSubject} from "../../redux/teacherReducer";
-import {useFetching} from "../../hooks/useFetchingDispatch.hook";
-
-const {Header, Content} = Layout;
+import {useFetching} from "../../hooks/useFetching.hook";
+import {useActions} from "../../hooks/useActions";
 const {Option} = Select;
 
 const Subject = ({subject, studyPlans = []}) => {
     const [form] = Form.useForm();
-    const {fetching, loading} = useFetching();
+    const {fetching} = useFetching();
+    const {updateSubject, getTypesEvents} = useActions();
     const typesEvents = useSelector(state => state.teacher.typesEvents);
     const [activeEvents, setActiveEvents] = useState([]);
 
@@ -33,16 +25,21 @@ const Subject = ({subject, studyPlans = []}) => {
         if (studyPlan) setActiveEvents(studyPlan.events);
     }, [subject]);
 
+    useEffect(() => {
+        if (!typesEvents) {
+            getTypesEvents();
+        }
+    }, []);
+
+    if (!typesEvents) return <Loader />;
+
     const onFinish = (values) => {
-        console.log("Цілий предмет: ", subject);
         fetching(updateSubject, {...values, id: subject.id});
     };
-    console.log(typesEvents);
     const studyPlansSelect = studyPlans.map(plan => <Option key={plan.id} value={plan.id}>{plan.name}</Option>);
 
     const onSelectChange = value => {
         const studyPlan = studyPlans.find(plan => plan.id === value);
-        console.log(studyPlan.events);
         setActiveEvents(studyPlan.events);
     }
 
@@ -50,14 +47,13 @@ const Subject = ({subject, studyPlans = []}) => {
         console.log('Failed:', errorInfo);
     };
 
-    const title = `${subject.class_name}-${subject.class_letter} ${subject.name}`;
-
     const typeEventsFilter = typesEvents.map(type => {
         return {
             text: type.type,
             value: type.id
         }
     });
+
     //Table
     const columns = [
         { title: '№', dataIndex: 'order_number' },
@@ -74,58 +70,17 @@ const Subject = ({subject, studyPlans = []}) => {
         },
         { title: 'Примітки', dataIndex: 'age' },
     ];
-    /*  id: 74
-        id_type_event: 13
-        name: "Тест"
-        notes: null
-        order_number: 1
-        short_name: "Тест"*/
-    // const data = [
-    //     {
-    //         key: '1',
-    //         name: 'John Brown',
-    //         age: 32,
-    //         address: 'New York No. 1 Lake Park',
-    //     },
-    //     {
-    //         key: '2',
-    //         name: 'Jim Green',
-    //         age: 42,
-    //         address: 'London No. 1 Lake Park',
-    //     },
-    //     {
-    //         key: '3',
-    //         name: 'Joe Black',
-    //         age: 32,
-    //         address: 'Sidney No. 1 Lake Park',
-    //     },
-    //     {
-    //         key: '4',
-    //         name: 'Jim Red',
-    //         age: 32,
-    //         address: 'London No. 2 Lake Park',
-    //     },
-    // ];
-    console.log(studyPlans);
 
     return (
-        <Layout>
-            <Header></Header>
-            <Content className={styles.form}>
-                <h1 className={styles.title}>{title}</h1>
+            <div className={styles.form}>
                 <Form
                     name="basic"
                     form={form}
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
-
-                    labelCol={{
-                        span: 4,
-                    }}
-                    wrapperCol={{
-                        span: 15,
-                    }}
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 15 }}
                 >
                     <Form.Item label="Опис дисципліни" name="other">
                         <Input/>
@@ -139,12 +94,7 @@ const Subject = ({subject, studyPlans = []}) => {
 
                     <Form.Item
                         label="Посилання на заняття:" name="link"
-                        rules={[
-                            {
-                                type: "url",
-                                message: 'Введене значення не є посиланням',
-                            },
-                        ]}
+                        rules={[{ type: "url", message: 'Введене значення не є посиланням'}]}
                     >
                         <Input/>
                     </Form.Item>
@@ -153,78 +103,13 @@ const Subject = ({subject, studyPlans = []}) => {
                         <Input/>
                     </Form.Item>
 
-                    <Form.Item
-
-
-                    >
+                    <Form.Item>
                         <Button className={styles.btn_wrap} type="primary" htmlType="submit">
                             Зберегти
                         </Button>
-
                     </Form.Item>
-
-
-                    {/*<Form.List name="events">*/}
-                    {/*    {(fields, {add, remove, move}) => (*/}
-                    {/*        <>*/}
-                    {/*            {fields.map(({key, name, ...restField}, index) => (*/}
-
-                    {/*                <Space key={key} style={{display: 'flex'}} align="baseline">*/}
-                    {/*                    <Form.Item*/}
-                    {/*                        label="Тема"*/}
-                    {/*                        {...restField}*/}
-                    {/*                        name={[name, 'name']}*/}
-                    {/*                        rules={[{required: true, message: 'Missing first name'}]}*/}
-                    {/*                    >*/}
-                    {/*                    </Form.Item>*/}
-
-                    {/*                    <Form.Item*/}
-                    {/*                        label="Скорочення"*/}
-                    {/*                        {...restField}*/}
-                    {/*                        name={[name, 'short_name']}*/}
-                    {/*                        tooltip="Для відображення в журналі оцінок"*/}
-                    {/*                        rules={[{message: 'Missing last name'}]}*/}
-                    {/*                    >*/}
-                    {/*                        <Input style={{maxWidth: '80px'}}/>*/}
-
-                    {/*                    </Form.Item>*/}
-                    {/*                    /!*<Tooltip title="Для відображення в журналі оцінок">*!/*/}
-                    {/*                    /!*    <QuestionOutlined />*!/*/}
-                    {/*                    /!*</Tooltip>*!/*/}
-                    {/*                    <Form.Item*/}
-                    {/*                        label="Тип"*/}
-                    {/*                        {...restField}*/}
-                    {/*                        name={[name, 'id_type_event']}*/}
-                    {/*                        rules={[{required: true, message: 'Missing last name'}]}*/}
-                    {/*                    >*/}
-                    {/*                        <Select placeholder={'Оберіть тип роботи:'} style={{width: 190}}>*/}
-                    {/*                            {typeEventsSelect}*/}
-                    {/*                        </Select>*/}
-
-                    {/*                    </Form.Item>*/}
-                    {/*                    <Form.Item*/}
-                    {/*                        label="Примітки"*/}
-                    {/*                        {...restField}*/}
-                    {/*                        name={[name, 'notes']}*/}
-                    {/*                    >*/}
-                    {/*                        <Input/>*/}
-                    {/*                    </Form.Item>*/}
-                    {/*                    <MinusCircleOutlined onClick={() => remove(name)}/>*/}
-                    {/*                    /!*<MinusCircleOutlined onClick={() => move(index, ++index)} />*!/*/}
-                    {/*                    <ArrowUpOutlined onClick={() => move(index, --index)}/>*/}
-                    {/*                    <ArrowDownOutlined onClick={() => move(index, ++index)}/>*/}
-                    {/*                </Space>*/}
-                    {/*            ))}*/}
-                    {/*            /!*<Form.Item>*!/*/}
-                    {/*            /!*    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*!/*/}
-                    {/*            /!*        Додати захід*!/*/}
-                    {/*            /!*    </Button>*!/*/}
-                    {/*            /!*</Form.Item>*!/*/}
-                    {/*        </>*/}
-                    {/*    )}*/}
-                    {/*</Form.List>*/}
-
                 </Form>
+
                 <div className={styles.table}>
                     <h2>План заходів: </h2>
                     <Table columns={columns}
@@ -233,28 +118,25 @@ const Subject = ({subject, studyPlans = []}) => {
                            locale={{filterReset: 'Скинути', emptyText: 'Немає даних'}}
                     />
                 </div>
-
-            </Content>
-        </Layout>
+            </div>
     );
 }
 
-export const SubjectTeacher = () => {
-    const dispatch = useDispatch();
-    const id = useParams().subjectId;
-    const subjects = useSelector(state => state.teacher.subjects);
+export const SubjectTeacher = ({subject}) => {
+    const {getPlans} = useActions();
     const studyPlans = useSelector(state => state.teacher.studyPlans);
     useEffect(() => {
-        if (!studyPlans) {
-            dispatch(getPlans());
+        if (!Array.isArray(studyPlans)) {
+            getPlans();
         }
-    }, [])
-    if (!subjects || !studyPlans) {
+    }, []);
+
+    if (!studyPlans) {
         return <Loader/>
     }
-    const subject = subjects.find(item => item.id == id);
+
     const studyPlanForClass = studyPlans
-        .filter(plan => plan.class_number === subject.class_name)
+        .filter(plan => plan.class_number === subject.class_number)
         .map(plan => {
             return {
                 ...plan, events: plan.events
@@ -263,8 +145,5 @@ export const SubjectTeacher = () => {
                     })
             }
         });
-    console.log(studyPlanForClass);
     return <Subject subject={subject} studyPlans={studyPlanForClass}/>
 }
-
-

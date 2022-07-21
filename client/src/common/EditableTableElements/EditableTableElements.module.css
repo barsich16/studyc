@@ -1,0 +1,18 @@
+.input {
+    width: 100% !important;
+}
+.cells {
+    padding: 2px!important;
+}
+.pad0 {
+    padding: 0px!important;
+}
+.test {
+    background-color: forestgreen;
+}
+.firstSemester {
+    background-color: #b3d8f1;
+}
+.secondSemester {
+    background-color: #9aabfd;
+}

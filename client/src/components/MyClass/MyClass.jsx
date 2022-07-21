@@ -1,130 +1,101 @@
 import styles from "./MyClass.module.css";
-import {Layout, Tabs, Table} from "antd";
-import {useEffect} from "react";
-import {connect} from "react-redux";
+import {Layout, Table, Modal, Button} from "antd";
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {getClass} from "../../redux/userReducer";
-
-const {TabPane} = Tabs;
-
-function callback(key) {
-    console.log(key);
-}
-
-const sortRowBySurname = (a, b) => {
-    if (a.surname < b.surname) {
-        return -1
-    } else if (a.surname > b.surname)
-        return 1
-    else {
-        return 0
-    }
-}
-const columns = [
-    {
-        title: 'Номер',
-        dataIndex: 'id',
-        key: 'id',
-    },
-    {
-        title: 'Прізвище',
-        dataIndex: 'surname',
-        key: 'surname',
-        // defaultSortOrder: 'ascend',
-        sorter: sortRowBySurname,
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: 'Ім\'я',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: 'По-батькові',
-        dataIndex: 'patronymic',
-        key: 'patronymic',
-    },
-    {
-        title: 'Телефон',
-        dataIndex: 'phone',
-        key: 'phone',
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-    }
-];
-const data2 = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        tags: ['nice', 'developer'],
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        tags: ['loser'],
-    }
-];
+import {sortRowBySurname} from "../../common/sortFunctions";
+import Loader from "../Loader";
+import {PupilMarksTabs} from "../Marks/PupilMarksTabs";
 
 const {Header, Content} = Layout;
-const MyClass = ({getClass, classmates, role}) => {
-    // const {fetching, loading} = useFetching();
-    // const dispatch = useDispatch();
-    // const classmates = useSelector(getClassmatesSelector);
-    // const role = useSelector(state => state.user.profile.role);
-    const deletePupilHandler = event => {
-        // Here must be async deleting pupil
-        //console.log(event.target.dataset.value);
-    }
-    if (role === 2) {
-        columns.push({
-                title: 'Дія',
-                key: 'action',
-                render: (text, record) => (
-                    <a data-value={record.id} onClick={deletePupilHandler}>Видалити</a>
-                ),
-            });
-    }
+
+export const MyClass = () => {
+    const dispatch = useDispatch();
+    const classPupils = useSelector(state => state.user.classPupils);
+    const profile = useSelector(state => state.user.profile);
+    const [activePupilId, setActivePupilId] = useState(null);
+
+    const columns = [
+        {
+            title: '№',
+            render: (text, record, index) => <span>{++index}</span>
+        },
+        {
+            title: 'Прізвище',
+            dataIndex: 'surname',
+            sorter: sortRowBySurname,
+            render: (text, record) => <Button onClick={() => setActivePupilId(record.id)} type="link">{text}</Button>
+        },
+        {
+            title: 'Ім\'я',
+            dataIndex: 'name',
+        },
+        {
+            title: 'По-батькові',
+            dataIndex: 'patronymic',
+        },
+        {
+            title: 'Телефон',
+            dataIndex: 'phone',
+            render: text => `+${text}`
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+        },
+        {
+            title: 'День народження',
+            dataIndex: 'birthdate',
+            render: text => new Date(text).toLocaleDateString("sq-AL", {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            })
+        }
+    ];
+
     useEffect(() => {
-        getClass();
-    }, [])
+        if (profile.class_number && !Array.isArray(classPupils)) {
+            dispatch(getClass());
+        }
+    }, []);
+
+    const handleCancel = () => {
+        setActivePupilId(null);
+    };
+
+    if (!profile.class_number) {
+        return <div>Ви не являєтесь класним керівником</div>
+    }
+
+    const letter = profile.class_letter
+        ? `-${profile.class_letter}`
+        : '';
+    const title = `${profile.class_number}${letter} Клас`;
+
     return (
-        <Layout>
-            <Header style={{}}>
-                Мій 10 клас
-            </Header>
-            <Content
-                className={styles.siteLayoutBackground}
-                style={{
-                    // margin: '24px 16px',
-                    // padding: 24,
-                    minHeight: 280,
-                }}>
-                <div className={styles.tabsContainer}>
-                    Мій 10 клас
-                    <Tabs defaultActiveKey="1" onChange={callback}>
-
-                        <TabPane tab="Учні" key="1">
-                            <Table columns={columns} dataSource={classmates}/>
-                        </TabPane>
-
-                        <TabPane tab="Вчителі" key="2">
-                            <Table columns={columns} dataSource={data2}/>
-                        </TabPane>
-                    </Tabs>
-                </div>
+        <>
+            <Header/>
+            <Content className={styles.layout}>
+                <h1 className={styles.title}>{title}</h1>
+                {classPupils
+                    ? <Table size={'middle'}
+                             columns={columns}
+                             dataSource={classPupils}
+                             pagination={false}
+                    />
+                    : <Loader/>
+                }
+                <Modal
+                    className={styles.modal}
+                    bodyStyle={{padding: '10px 24px'}}
+                    visible={activePupilId}
+                    width={1200}
+                    centered
+                    onCancel={handleCancel}>
+                    <PupilMarksTabs pupilId={activePupilId}/>
+                </Modal>
             </Content>
-        </Layout>
+        </>
     );
 }
-
-const mapState = state => ({
-    role: state.user.profile.role,
-    classmates: state.user.classmates
-})
-export default connect(mapState, {getClass})(MyClass);

@@ -1,46 +1,83 @@
-const testDataUser = require('../data').users;
-const testDataSubjects = require('../data').subjects;
-const testMarks = require('../data').globalMarks;
-const testClass = require('../data').class;
-const testStudyPlans = require('../data').studyPlans;
-const testDataPlansEvents = require('../data').plansEvents;
-const testDataStudyEvents = require('../data').studyEvents;
-const testTypesEvents = require('../data').typesEvents;
-const db = require('../db');
+const db = require('../db/db');
+const query = require('../db/queries');
 const ApiError = require('../exceptions/api-error');
 
-class TeachController {
-    async testGetMarksInfo(req, res) {
+const changeMarksMaker = (subjectId, promises) => {
+    return (newMarks, query) => {
         try {
-            const userId = +req.params.id;
-            console.log("User: ", userId);
-            //req.user.userId
-            //{id: 1, name: 'Математика', teacherId: 2, classId: 2, studyPlan: 1},
-            // const subjects = testDataSubjects.filter(item => {
-            //     return item.teacherId == req.user.userId
-            // })
+            for (const newMark of newMarks) {
+                const eventsId = Object.keys(newMark.marks);
+                for (const eventId of eventsId) {
+                    let result = db.query(query, [newMark.pupil_id, subjectId, +eventId, +newMark.marks[eventId]]);
+                    promises.push(result);
+                }
+            }
+        } catch (e) {
+            throw ApiError.DataBaseError();
+        }
+    }
+}
+const findEventsByPlans = async planId => {
+    try {
+        const events = await db.query(
+            `select id, name, short_name, order_number, notes, study_plan_id, semester, (select id as id_type_event from "TypesEvents" where "TypesEvents".id = "StudyEvents".types_events_id)
+                        from "StudyEvents" where study_plan_id = $1 and order_number is not NULL ORDER BY order_number`, [planId]
+        );
+        return events.rows;
+    } catch (e) {
+        throw e;
+    }
+}
 
-            res.json(testMarks);
+class TeachController {
+    async getMarks(req, res) {
+        try {
+            const subjectId = +req.params.id;
+            const allMarks = await db.query(`select mark, pupil_id, event_id from "Marks" where subject_id = $1`, [subjectId]);
+            const pupils = await db.query(`select surname || ' ' || name || ' ' || patronymic as pupil_name, id as key from "Users" 
+                where class_id = (select class_id from "Subjects" where id = $1) and role = 'pupil'`, [subjectId])
+            const allEventsFromStudyPlan = await db.query(`select id, name, short_name, order_number, semester, 
+                (select required_type from "TypesEvents" where id = "StudyEvents".types_events_id) 
+                from "StudyEvents" where study_plan_id =
+                (select plan_id from "Subjects" where id = $1) order by required_type, order_number`, [subjectId]);
 
+            const pupilsMarks = pupils.rows.map(pupil => {
+                const pupilsMarks = allMarks.rows.filter(record => record.pupil_id === pupil.key);
+                const obj = {};
+                pupilsMarks.forEach(record => {
+                    obj[record.event_id] = record.mark;
+                });
+                return {...pupil, ...obj};
+            });
+            const response = {id: subjectId, events: allEventsFromStudyPlan.rows, pupilsMarks};
+
+            res.json(response);
         } catch (e) {
             res.status(500).json('Помилка при пошуку оцінок');
         }
     }
 
-    async testUpdateMarksInfo(req, res, next) {
+    async updateMarks(req, res, next) {
         try {
-            const {subjectName, newMarks} = req.body;
-            const marksItem = Object.keys(testMarks).find(item => {
-                return item === subjectName
-            });
-            if (!marksItem) {
-                return res.status(400).json({message: 'Не знайдено предмету', resultCode: 1})
+            const {deletedMarks, addedMarks, updatedMarks, subjectId} = req.body;
+            const promises = [];
+            const changeMarks = changeMarksMaker(subjectId, promises);
+
+            if (deletedMarks.length > 0) {
+                changeMarks(deletedMarks, query.deleteMark);
+            }
+            if (addedMarks.length > 0) {
+                changeMarks(addedMarks, query.addMark);
+            }
+            if (updatedMarks.length > 0) {
+                changeMarks(updatedMarks, query.updateMark);
             }
 
-            testMarks[marksItem] = newMarks;
+            await Promise.all(promises);
+
             res.json({resultCode: 0, message: 'Зміни збережено'});
         } catch (e) {
-            res.status(500).json('Помилка при пошуку оцінок');
+            next(e);
         }
     }
 
@@ -49,25 +86,13 @@ class TeachController {
             const userId = +req.params.id;
 
             const {rows} = await db.query(
-                `select Sub.name, Sub.other, Sub.other_materials, Sub.id, Sub.link, Clas.id as class_id, Clas.number as class_name, Clas.letter as class_letter, 
-                Stud.id as study_plan_id, Stud.name as study_plan_name, Stud.class_number from "Subjects" as Sub 
+                `select Sub.name, Sub.other, Sub.other_materials, Sub.id, Sub.link, Clas.id as class_id, Clas.number as class_number, Clas.letter as class_letter, 
+                Stud.id as study_plan_id, Stud.name as study_plan_name from "Subjects" as Sub 
                 LEFT JOIN "StudyPlans" as Stud ON Sub.plan_id = Stud.id 
                 LEFT JOIN "Classes" as Clas ON Sub.class_id = Clas.id where Sub.teacher_id = $1`, [userId]
             );
-            console.log(rows);
 
-            // for (const subject of rows) {
-            //     const queryEvents = await db.query(
-            //         `select id, name, short_name, order_number, notes, (select id as id_type_event from "TypesEvents" where "TypesEvents".id = "StudyEvents".types_events_id)
-            //             from "StudyEvents" where id in (select event_id from "plans_events" where plan_id = $1) ORDER BY order_number`, [subject.study_plan_id]
-            //     );
-            //     subject.events = queryEvents.rows;
-            // }
-
-            const typesStudyEvents = await db.query(`select * from "TypesEvents"`)
-
-            res.json({subjects: rows, types: typesStudyEvents.rows});
-
+            res.json({subjects: rows});
         } catch (e) {
             res.status(500).json('Помилка при пошуку');
         }
@@ -77,42 +102,23 @@ class TeachController {
         try {
             const newSubjectInfo = req.body;
 
-            // const eventsId = await db.query(   //видаляємо зв'язок з батьківської таблиці багато до багатьох
-            //     `DELETE FROM "plans_events" where plan_id = $1 returning event_id`, [newSubjectInfo.study_plan_id]
-            // );
-            //
-            // for (const item of eventsId.rows) {    //видаляємо старі записи в StudyEvents
-            //     await db.query(`DELETE FROM "StudyEvents" where id = $1`, [item.event_id]);
-            // }
-            //
-            // const newEventsId = [];
-            // console.log(newSubjectInfo);
-            // if (newSubjectInfo.events.length > 0) {
-            //     for (const newEvent of newSubjectInfo.events) {    //створюємо нові записи в StudyEvents
-            //         const {rows} = await db.query(`
-            //         INSERT INTO "StudyEvents" (name, short_name, types_events_id, order_number, notes)
-            //         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-            //             [newEvent.name, newEvent.short_name, newEvent.id_type_event, newEvent.order_number, newEvent.notes]);
-            //         newEventsId.push(rows[0].id);
-            //     }
-            //
-            //     for (const eventId of newEventsId) { //створюємо зв'язок в батьківській таблиці багато до багатьох
-            //         await db.query(
-            //             `INSERT INTO "plans_events" (plan_id, event_id) VALUES ($1, $2)`,
-            //             [newSubjectInfo.study_plan_id, eventId]
-            //         );
-            //     }
-            // }
-
-            await db.query(  //оновлюємо дані про предмет
+            await db.query(
                 `Update "Subjects" set other_materials = $1, link = $2, other = $3, plan_id = $4 where id = $5`,
                 [newSubjectInfo.other_materials, newSubjectInfo.link, newSubjectInfo.other, +newSubjectInfo.study_plan, +newSubjectInfo.id]
             );
 
             res.json({message: 'Дані оновлено'});
         } catch (e) {
-            console.log(e);
             res.status(500).json('Помилка при пошуку ');
+        }
+    }
+
+    async getTypesEvents(req, res, next) {
+        try {
+            const {rows: typesEvents} = await db.query(`select * from "TypesEvents" where required_type is NULL`);
+            res.json(typesEvents);
+        } catch (e) {
+            res.status(500).json('Помилка при пошуку оцінок');
         }
     }
 
@@ -122,17 +128,9 @@ class TeachController {
             const {rows} = await db.query(`select * from "StudyPlans" where teacher_id = $1`, [userId])
 
             for (const plan of rows) {
-                const queryEvents = await db.query(
-                    `select id, name, short_name, order_number, notes, (select id as id_type_event from "TypesEvents" where "TypesEvents".id = "StudyEvents".types_events_id)
-                        from "StudyEvents" where id in (select event_id from "plans_events" where plan_id = $1) ORDER BY order_number`, [plan.id]
-                );
-                plan.events = queryEvents.rows;
+                plan.events = await findEventsByPlans(plan.id);
             }
-            console.log(rows);
-
             res.json({plans: rows});
-            //res.json('Test');
-
         } catch (e) {
             res.status(500).json('Помилка при пошуку оцінок');
         }
@@ -140,81 +138,85 @@ class TeachController {
 
     async updatePlans(req, res, next) {
         try {
-            const newPlan = req.body;
-            console.log(newPlan);
-            if (newPlan.isPlanNew) {
-                console.log("This plan is NEW");
+            let {
+                name, class_number, events = null, isPlanNew = false,
+                id, year, cabinet = null
+            } = req.body;
+            const promises = [];
 
-                const newStudyPlan = await db.query(  //створюємо новий план в StudyPlans
-                    `INSERT INTO "StudyPlans" (name, teacher_id, class_number) 
-                    VALUES ($1, $2, $3) Returning id`,
-                    [newPlan.name, req.user.userId, newPlan.class_number]
+            if (isPlanNew) {
+                const newStudyPlan = await db.query(
+                    `INSERT INTO "StudyPlans" (name, teacher_id, class_number, year, cabinet)
+                    VALUES ($1, $2, $3, $4, $5) Returning id`,
+                    [name, req.user.userId, class_number, year, cabinet]
                 );
-                newPlan.id = newStudyPlan.rows[0].id;
-            } else {
-                console.log("This plan is old");
-                await db.query(
-                    `Update "StudyPlans" set class_number = $1 where id = $2`,
-                    [newPlan.class_number, newPlan.id]
-                );
+                id = newStudyPlan.rows[0].id;
 
-                const eventsId = await db.query(   //видаляємо зв'язок з батьківської таблиці багато до багатьох
-                    `DELETE FROM "plans_events" where plan_id = $1 returning event_id`, [newPlan.id]
+                const {rows: specialEvents} = await db.query(  //шукаємо айдішніки для семестрових та річної
+                    `select * from "TypesEvents" where required_type IS NOT NULL order by required_type`
                 );
-                for (const item of eventsId.rows) {    //видаляємо старі записи в StudyEvents
-                    await db.query(`DELETE FROM "StudyEvents" where id = $1`, [item.event_id]);
+                for (const specialEvent of specialEvents) {
+                    const addEvent = db.query(`
+                            INSERT INTO "StudyEvents" (name, types_events_id, study_plan_id)
+                            VALUES ($1, $2, $3) RETURNING id`,
+                        [specialEvent.type, specialEvent.id, id]);
+                    promises.push(addEvent);
                 }
             }
 
-            const newEventsId = [];
-            if (newPlan.events && newPlan.events.length > 0) {
-                for (const newEvent of newPlan.events) {    //створюємо нові записи в StudyEvents
-                    const {rows} = await db.query(`
-                            INSERT INTO "StudyEvents" (name, short_name, types_events_id, order_number, notes)
-                            VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-                        [newEvent.name, newEvent.short_name, newEvent.id_type_event, newEvent.order_number, newEvent.notes]);
-                    newEventsId.push(rows[0].id);
+            if (events) {
+                const {addedEvents = [], deletedEvents = [], updatedEvents = []} = events;
+                if (deletedEvents.length > 0) {
+                    for (const deletedEvent of deletedEvents) {
+                        const deleteEvent = db.query(`
+                            DELETE FROM "StudyEvents" where id = $1`,
+                            [deletedEvent]
+                        );
+                        promises.push(deleteEvent);
+                    }
                 }
-
-                for (const eventId of newEventsId) { //створюємо зв'язок в батьківській таблиці багато до багатьох
-                    await db.query(
-                        `INSERT INTO "plans_events" (plan_id, event_id) VALUES ($1, $2)`,
-                        [newPlan.id, eventId]
-                    );
+                if (addedEvents.length > 0) {
+                    for (const addedEvent of addedEvents) {
+                        const addEvent = db.query(`
+                            INSERT INTO "StudyEvents" (name, short_name, types_events_id, order_number, notes, study_plan_id, semester)
+                            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+                            [addedEvent.name, addedEvent.short_name, addedEvent.id_type_event, addedEvent.order_number, addedEvent.notes, id, addedEvent.semester]);
+                        promises.push(addEvent);
+                    }
+                }
+                if (updatedEvents.length > 0) {
+                    for (const updatedEvent of updatedEvents) {
+                        const updateEvent = db.query(`
+                            UPDATE "StudyEvents" SET name = $1, short_name = $2, types_events_id = $3, order_number = $4, notes = $5, semester = $6 where id = $7`,
+                            [updatedEvent.name, updatedEvent.short_name, updatedEvent.id_type_event, updatedEvent.order_number, updatedEvent.notes, updatedEvent.semester, updatedEvent.id]
+                        );
+                        promises.push(updateEvent);
+                    }
                 }
             }
-            res.json({message: 'Дані оновлено', id: newPlan.id});
+            const updatePlan = db.query(
+                `Update "StudyPlans" set class_number = $1, cabinet = $2 where id = $3`,
+                [class_number, cabinet, id]
+            )
+
+            promises.push(updatePlan)
+            await Promise.all(promises);
+            const newEvents = await findEventsByPlans(id);
+
+            res.json({message: 'Дані оновлено', id, newEvents});
         } catch (e) {
-            console.log(e);
             res.status(500).json('Помилка при пошуку ');
         }
     }
 
     async deletePlan(req, res, next) {
         try {
-            const planId = req.body.planId;
-            const {rows} = await db.query(
-                `DELETE FROM "plans_events" where plan_id = $1 Returning event_id`,
-                [planId]
-            );
-            console.log(rows);
-            if(rows.length > 0) {
-                const promises = [];
-                for (const row of rows) {
-                    const deleteEvent = db.query(`DELETE FROM "StudyEvents" where id = $1`, [row.event_id]);
-                    promises.push(deleteEvent);
-                }
-                await Promise.all(promises);
-            }
-            await db.query(`DELETE FROM "StudyPlans" where id = $1`, [planId]);
-
+            await db.query(`DELETE FROM "StudyPlans" where id = $1`, [req.body.planId]);
             res.json({message: 'Навчальний план видалено'});
         } catch (e) {
-            console.log(e);
-            res.status(500).json('Помилка при пошуку ');
+            res.status(500).json('Помилка при видаленні навчального плану');
         }
     }
-
 }
 
 module.exports = new TeachController();

@@ -1,160 +1,113 @@
+import React, {useEffect, useRef, useState} from "react";
+import {Button, Form, Input, Space} from "antd";
 import styles from "./Appointment.module.css";
-import {Button, Cascader, Form, Input, Layout, Select} from "antd";
-import React, {useState} from "react";
-import AppointmentTable from "./AppointmentTable";
+import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {useDispatch, useSelector} from "react-redux";
+import {useFetching} from "../../hooks/useFetchingDispatch.hook";
+import {getChangedEvents} from "../../common/sortFunctions";
+import Loader from "../Loader";
+import usePrompt from "../../hooks/usePrompt.hook";
+import {message} from "antd";
+import {getAppointment, updateAppointment} from "../../redux/adminReducer";
+import SearchedSelect from "../common/SearchedSelect";
 
-const {Header, Content} = Layout;
-const { Option } = Select;
-const data = [
-    {
-        key: '1',
-        name: 'Teacherenko Teacher Teacherovych',
-        className: 10,
-        subject: 'Математика',
-    },
-    {
-        key: '2',
-        name: 'Teacherenko Teacher Teacherovych',
-        className: '10-A',
-        subject: 'Алгебра',
-    },
-    {
-        key: '3',
-        name: 'Teacherenko Teacher Teacherovych',
-        className: '9',
-        subject: 'Геометрія',
-    },
-    {
-        key: '4',
-        name: 'Teacherenko Teacher Teacherovych',
-        className: '1-B',
-        subject: 'Креслення',
-    },
-];
-const columns = [
-    {
-        title: 'ПІБ вчителя',
-        dataIndex: 'name',
-        key: 'name',
-        addSearch: true
-    },
-    {
-        title: 'Клас',
-        dataIndex: 'className',
-        key: 'className',
-        addSearch: true
-    },
-    {
-        title: 'Предмет',
-        dataIndex: 'subject',
-        key: 'subject',
-        addSearch: true
-        // sorter: (a, b) => a.address.length - b.address.length,
-        // sortDirections: ['descend', 'ascend'],
-    },
-];
-
-const options = [
-    {
-        label: 'Light',
-        value: 'light',
-        children: new Array(20)
-            .fill(null)
-            .map((_, index) => ({ label: `Number ${index}`, value: index })),
-    },
-    {
-        label: 'Bamboo',
-        value: 'bamboo',
-        children: [
-            {
-                label: 'Little',
-                value: 'little',
-                children: [
-                    {
-                        label: 'Toy Fish',
-                        value: 'fish',
-                    },
-                    {
-                        label: 'Toy Cards',
-                        value: 'cards',
-                    },
-                    {
-                        label: 'Toy Bird',
-                        value: 'bird',
-                    },
-                ],
-            },
-        ],
-    },
-];
-
-export const Appointment = () => {
+const Appointment = ({appointment, teachers, classId}) => {
     const [form] = Form.useForm();
-    const [formLayout, setFormLayout] = useState('horizontal');
+    const {fetching} = useFetching();
+    const isUnsavedChanges = useRef(false);
+    usePrompt("Ви дійсно хочете піти? Всі незбережені дані буде утрачено", isUnsavedChanges.current);
 
-    const onChange = value => {
-        console.log(value);
+    const [subjects, setSubjects] = useState(appointment);
+
+    const example = teachers.map(employee => {
+        return {key: `${employee.surname} ${employee.name} ${employee.patronymic}`, value: employee.key}
+    })
+
+    useEffect(() => {
+        form.setFieldsValue({
+            subjects: subjects
+        });
+    }, []);
+
+    const onFinish = (newValues) => {
+        const changedSubjects = getChangedEvents(appointment, newValues.subjects);
+        fetching(updateAppointment, {classId, changedSubjects});
+        isUnsavedChanges.current = false;
     };
 
     return (
-        <Layout>
-            <Header>
-            </Header>
-            <Content
-                className={styles.siteLayoutBackground}
-                style={{
-                    // margin: '24px 16px',
-                    // padding: 24,
-                    minHeight: 280,
-                }}>
-                <div className={styles.tabsContainer}>
-                    <Form
-                        layout='inline'
-                        form={form}
-                        initialValues={{
-                            layout: formLayout,
-                        }}
-                        style={{marginBottom: 30}}
-                        // onValuesChange={onFormLayoutChange}
-                    >
-                        <Form.Item label="Назва предмету">
-                            <Input placeholder="Алгебра" />
-                        </Form.Item>
-                        <Form.Item label="Класи" style={{minWidth: 230}}>
-                            <Cascader
-                                style={{ minWidth: 300 }}
-                                options={options}
-                                onChange={onChange}
-                                multiple
-                                maxTagCount="responsive"
-                                placeholder={'Натисніть щоб обрати'}
-                            />
-                        </Form.Item>
-                        <Form.Item label="Вчитель">
-                            <Select
-                                style={{ minWidth: 150 }}
-                                showSearch
-                                placeholder="Натисніть щоб обрати"
-                                optionFilterProp="children"
-                                onChange={onChange}
-                                // onSearch={onSearch}
-                                filterOption={(input, option) =>
-                                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                }
-                            >
-                                <Option value="jack">Jack</Option>
-                                <Option value="lucy">Lucy</Option>
-                                <Option value="tom">Tom</Option>
-                            </Select>
-                        </Form.Item>
-                        <Form.Item>
-                            <Button type="primary">Створити</Button>
-                        </Form.Item>
-                    </Form>
-                    <AppointmentTable columns={columns} data={data}/>
-                </div>
-            </Content>
-        </Layout>
+        <>
+            <Form
+                name="appointment"
+                form={form}
+                onFinish={onFinish}
+                onFinishFailed={() => message.error('Форма заповнена некоректно!')}
+                autoComplete="off"
+            >
+                <Form.List name="subjects">
+                    {(fields, {add, remove}) => (
+                        <>
+                            {fields.map(({key, name, ...restField}) => (
+
+                                <Space key={key} style={{display: 'flex', justifyContent: 'start'}} align="baseline">
+                                    <Form.Item
+                                        label="Назва предмету"
+                                        {...restField}
+                                        name={[name, 'name']}
+                                        rules={[{required: true, message: 'Missing first name'}]}
+                                    >
+                                        <Input style={{width: 250}} placeholder='Вкажіть назву предмету...'/>
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="Вчитель"
+                                        {...restField}
+                                        name={[name, 'teacher_id']}
+                                        rules={[{required: true, message: 'Missing last name'}]}
+                                        className={styles.teacher}
+                                    >
+                                        <SearchedSelect children={example}
+                                                        style={{minWidth: 350}}
+                                                        placeholder={'Оберіть вчителя...    '}/>
+                                    </Form.Item>
+
+                                    <MinusCircleOutlined onClick={() => remove(name)}/>
+                                </Space>
+                            ))}
+                            <Form.Item>
+                                <Button type="dashed" onClick={() => add()} block
+                                        icon={<PlusOutlined/>}>
+                                    Додати предмет
+                                </Button>
+                            </Form.Item>
+                        </>
+                    )}
+                </Form.List>
+                <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                        Зберегти
+                    </Button>
+                </Form.Item>
+            </Form>
+        </>
     );
 }
 
+export const AppointmentContainer = React.memo(({classId}) => {
+    const dispatch = useDispatch();
+    const employees = useSelector(state => state.admin.employees.filter(item => item.role !== 'pupil'));
+    const classInfo = useSelector(state => state.admin.appointment.find(item => item.classId === classId));
+
+    useEffect(() => {
+        if (!classInfo) {
+            dispatch(getAppointment(classId));
+        }
+    }, []);
+
+    if (!classInfo || !employees) {
+        return <>
+            <Loader/>
+        </>
+    }
+    return <Appointment appointment={classInfo.subjects} teachers={employees} classId={classId}/>
+})

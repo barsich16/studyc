@@ -5,11 +5,17 @@ import userReducer from "./userReducer";
 import teacherReducer from "./teacherReducer";
 import adminReducer from "./adminReducer";
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
     user: userReducer,
     teacher: teacherReducer,
     admin: adminReducer,
 });
+const rootReducer = (state, action) => {
+    if (action.type === 'USER_LOGOUT') {
+        state = undefined
+    }
+
+    return appReducer(state, action)
+}
 const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
-window.store = store;
 export default store;

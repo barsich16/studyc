@@ -17,5 +17,8 @@ module.exports = class ApiError extends Error {
     static TokenExpiredError() {
         return new ApiError(401, 'Термін дії токену вийшов');
     }
+    static DataBaseError() {
+        return new ApiError(500, 'Помилка при оновленні даних. Спробуйте ще раз');
+    }
 }
 

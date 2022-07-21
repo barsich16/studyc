@@ -1,7 +1,8 @@
-/*.siteLayout .siteLayoutBackground {*/
-/*    background: #fff;*/
-/*}*/
 .inner {
     height: 280px;
     background-color: #042d53;
+}
+.cardwrapper {
+    display: flex;
+    justify-content: space-between;
 }

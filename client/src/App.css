@@ -1,10 +1,6 @@
 .ant-card-meta-title {
   margin-bottom: 0px!important;
 }
-/*.ant-card-meta {*/
-/*  display: flex;*/
-/*  justify-content: center;*/
-/*}*/
 .ant-card {
   background-color: transparent;
 }
@@ -12,11 +8,7 @@
   border: 0;
   border-top: 1px solid #f0f0f0;
 }
-
-
-
 .animwrap {
-
   font-size: 22px;
   font-weight: 500;
   padding: 30px;
@@ -34,10 +26,10 @@
   margin-bottom: 10px;
 }
 .animwrap h3 {
-  margin-top: 50px;
+  margin-top: 40px;
   font-size: 16px;
   font-weight: 500;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 .btn {
   background-color: transparent;
@@ -64,7 +56,6 @@
   color: #fff;
   outline: 0;
 }
-
 .first {
   -webkit-transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
   transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
@@ -72,50 +63,22 @@
 .first:hover {
   box-shadow: 0 0 40px 40px #04243b inset;
 }
-.cardwrapper {
-  display: flex;
-  justify-content: space-between;
-}
-
-
-
-  /*modal window*/
-
-.anticon {
-  /*color: red;*/
-  /*font-size: 14px;*/
-}
 
 /*особлива модалка для mainpage*/
 .ant-modal.mainpage-modal .ant-modal-content {
   border-radius: 30px;
   background-color: transparent!important;
 }
-
-
 .ant-modal-close {
   z-index: 1001;
 }
-
 /* Для вчительського журналу обліку*/
 .editable-cell {
   position: relative;
 }
-
 .editable-cell-value-wrap {
-  /*padding: 1px 4px;*/
   cursor: pointer;
 }
-
-.editable-row:hover .editable-cell-value-wrap {
-  /*padding: 1px 4px;*/
-  /*border: 1px solid #d9d9d9;*/
-  /*border-radius: 2px;*/
-}
-
-/*[data-theme='dark'] .editable-row:hover .editable-cell-value-wrap {*/
-/*  border: 1px solid #434343;*/
-/*}*/
 .marks-wrapper.ant-form-item {
   max-width: 31px!important;
 }
@@ -125,7 +88,9 @@
 .ant-form-item-control-input {
   min-height: auto!important;
   width: auto!important;
-
+}
+.ant-input-number-input {
+  text-align: center!important;
 }
 .ant-input-sm{
   padding: 0 0px!important;
@@ -136,7 +101,6 @@
 .ant-space-item .ant-form-item{
   margin-bottom: 20px!important;
 }
-
 /*Для полів реєстрації та кнопки*/
 .formreg .ant-form-item {
   margin-bottom: 10px!important;
@@ -144,8 +108,6 @@
 .formreg .ant-form-item:last-child .ant-btn {
   height: auto!important;
 }
-
-
 /*Для номеру класу в налаштуваннях*/
 .ant-form-text {
   padding-top: 4px;
@@ -154,10 +116,14 @@
 /*Для зміни заднього фону при autocomplete chrome*/
 input:-webkit-autofill {
   -webkit-box-shadow: inset 0 0 0 50px #fff !important; /* Цвет фона */
-  /*-webkit-text-fill-color: #999 !important; !* цвет текста *!*/
   color: #999 !important; /* цвет текста */
 }
-
-/*.ant-table-cell-row-hover {*/
-/*  background: #000;*/
-/*}*/
+.centered-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/*Зменшення відступу між головними табами і Журнал-Загальне*/
+.mainTab .ant-tabs-nav {
+  margin: 0 0 5px!important;
+}

@@ -3,6 +3,8 @@
     font-size: 35px;
 }
 .form {
-    margin: 40px!important;
-    /*width: 800px!important;*/
+    margin: 30px 20px 20px!important;
+}
+.modalForm {
+    margin: 10px!important;
 }

@@ -1,6 +1,11 @@
-.siteLayout .siteLayoutBackground {
-    background: #fff;
-}
-.tabsContainer {
+.layout {
+    min-height: 280px;
     padding: 20px;
+}
+.title {
+    margin-bottom: 30px;
+    font-size: 35px;
+}
+.modal {
+    margin: 20px!important;
 }

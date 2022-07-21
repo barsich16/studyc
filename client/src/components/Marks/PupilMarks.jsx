@@ -1,52 +1,88 @@
-import {connect} from "react-redux";
-import {Layout, Tabs} from "antd";
-import Loader from "../Loader";
+import React, {useEffect} from 'react';
+import {Button, Card, Table} from 'antd';
 import styles from "./TeacherMarks.module.css";
-import React, {useEffect} from "react";
-import {TablePupilMarks} from "./TablePupilMarks";
+import {useDispatch, useSelector} from "react-redux";
 import {getMarks} from "../../redux/userReducer";
-const {TabPane} = Tabs;
-const {Header, Content} = Layout;
+import Loader from "../Loader";
 
-const PupilMarks = ({marks, getMarks}) => {
+export const PupilMarks = ({pupilId, subjectId}) => {
+    const subject = useSelector(state => state.user.marks.find(item => item.pupilId === pupilId).subjects.find(item => item.id === subjectId));
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        getMarks();
-    }, [])
+        if (!subject.marks) {
+            console.log("Запрос за конкретними...");
+            dispatch(getMarks(pupilId, subjectId));
+        }
+    }, [subjectId]);
 
-    if (!marks) {
-        return <Layout>
-            <Loader />
-        </Layout>
-    } else {
-        const keysArray = Object.keys(marks);
-        const tabPanes = keysArray.map((item, index) =>
-            <TabPane tab={item} key={index}>
-                <TablePupilMarks data={marks[item]} />
-            </TabPane>
-        );
-
-        return (
-            <Layout>
-                <Header style={{}}>
-                    Мій 10 клас
-                </Header>
-                <Content
-                    className={styles.siteLayoutBackground}
-                    style={{minHeight: 280}}>
-                    <div className={styles.tabsContainer}>
-                        <Tabs defaultActiveKey="0">
-                            {tabPanes}
-                        </Tabs>
-                    </div>
-                </Content>
-            </Layout>
-        );
+    if (!subject || !subject.marks) {
+        return <Loader/>
     }
+
+    const {other, link, other_materials, teacher_name, email} = subject;
+    const columns = [
+        {
+            title: 'Дата',
+            dataIndex: 'creation_date',
+            render: (text) => {
+                if (text) {
+                    const newDate = new Date(text);
+                    const month = newDate.getMonth() + 1;
+                    return `${newDate.getDate()}.${month < 10 && '0' + month}.${newDate.getFullYear()}`
+                }
+            }
+        },
+        {
+            title: 'Тема роботи',
+            dataIndex: 'name',
+        },
+        {
+            title: 'Тип роботи',
+            dataIndex: 'type',
+        },
+        {
+            title: 'Оцінка',
+            dataIndex: 'mark',
+            align: 'center'
+        }
+    ];
+
+    return (
+        <div className={styles.wrapper}>
+            <div className={styles.tableWrapper}>
+                <Table
+                    columns={columns}
+                    pagination={false}
+                    size={"small"}
+                    dataSource={subject.marks}
+                />
+            </div>
+
+            <Card title={'Вчитель: ' + teacher_name ?? 'Вчитель не призначений'} style={{ minWidth: 350 }}>
+                <p><b>Email: </b> {email ?? "Не вказаний"} </p>
+                <p><b>Посилання на заняття: </b>
+                    {link
+                        ? <Button
+                            type="link"
+                            style={{padding: 0}}
+                            onClick={() => window.open(link)}>
+                                Перейти
+                          </Button>
+                        : "Ще не додано"}
+                </p>
+                <p><b>Додаткові матеріали: </b>
+                    {other_materials
+                        ? <Button
+                            type="link"
+                            style={{padding: 0}}
+                            onClick={() => window.open(other_materials)}>
+                            Перейти
+                        </Button>
+                        : "Ще не додано"}
+                </p>
+                <p><b>Опис дисципліни: </b> {other ?? "Не вказаний"}</p>
+            </Card>
+        </div>
+    );
 }
-
-const mapState = state => ({
-    marks: state.user.marks,
-})
-
-export default connect(mapState, {getMarks})(PupilMarks);

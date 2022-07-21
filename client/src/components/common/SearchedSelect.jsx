@@ -5,6 +5,7 @@ const SearchedSelect = (props) => {
     const options = children.map(child => {
         return <Select.Option value={child.value}>{child.key}</Select.Option>
     })
+
     return (
         <Select
                 {...properties}
@@ -15,8 +16,6 @@ const SearchedSelect = (props) => {
                 }
         >
             {options}
-            {/*<Select.Option value="demo">Teacherenko Teacher Teacherovych</Select.Option>*/}
-            {/*<Select.Option value="demo1">Teacherenko Viktor Teacherovych</Select.Option>*/}
         </Select>
     );
 }

@@ -3,8 +3,6 @@ import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import React from "react";
 
-
-
 class AppointmentTable extends React.Component {
     state = {
         searchText: '',
@@ -18,7 +16,7 @@ class AppointmentTable extends React.Component {
                     ref={node => {
                         this.searchInput = node;
                     }}
-                    placeholder={`Знайти ${dataIndex}`}
+                    placeholder={`Знайти`}
                     value={selectedKeys[0]}
                     onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
@@ -30,25 +28,12 @@ class AppointmentTable extends React.Component {
                         onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
                         icon={<SearchOutlined />}
                         size="small"
-                        style={{ width: 90 }}
+                        style={{ width: 85 }}
                     >
                         Знайти
                     </Button>
-                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 85 }}>
                         Скинути
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({ closeDropdown: false });
-                            this.setState({
-                                searchText: selectedKeys[0],
-                                searchedColumn: dataIndex,
-                            });
-                        }}
-                    >
-                        Фільтрувати
                     </Button>
                 </Space>
             </div>
@@ -90,9 +75,6 @@ class AppointmentTable extends React.Component {
     };
 
     render() {
-        // if(this.props.columns) {
-        //     console.log('Columns are here');
-        // }
         const columns = this.props.columns.map(column => {
             if (column.addSearch) {
                 return {
@@ -102,48 +84,8 @@ class AppointmentTable extends React.Component {
             }
             return column
         })
-        // const columns2 = this.props.columns
-        //     ?  [{
-        //         title: 'ПІБ вчителя',
-        //         dataIndex: 'name',
-        //         key: 'name',
-        //         // width: '30%',
-        //         ...this.getColumnSearchProps('name'),
-        //     },
-        //         {
-        //             title: 'Клас',
-        //             dataIndex: 'className',
-        //             key: 'className',
-        //             // width: '20%',
-        //             ...this.getColumnSearchProps('className'),
-        //         },]
-        //     : [
-        //         {
-        //             title: 'ПІБ вчителя',
-        //             dataIndex: 'name',
-        //             key: 'name',
-        //             // width: '30%',
-        //             ...this.getColumnSearchProps('name'),
-        //         },
-        //         {
-        //             title: 'Клас',
-        //             dataIndex: 'className',
-        //             key: 'className',
-        //             // width: '20%',
-        //             ...this.getColumnSearchProps('className'),
-        //         },
-        //         {
-        //             title: 'Предмет',
-        //             dataIndex: 'subject',
-        //             key: 'subject',
-        //             ...this.getColumnSearchProps('subject'),
-        //             // sorter: (a, b) => a.address.length - b.address.length,
-        //             // sortDirections: ['descend', 'ascend'],
-        //         },
-        //     ];
 
-        console.log(this);
-        return <Table columns={columns} dataSource={this.props.data} />;
+        return <Table size={"middle"} columns={columns} dataSource={this.props.data} />;
     }
 }
 export default AppointmentTable;

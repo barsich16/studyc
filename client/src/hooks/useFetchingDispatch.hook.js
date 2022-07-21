@@ -10,11 +10,9 @@ export const useFetching = () => {
         try {
             setLoading(true);
             const result = await dispatch(callback(...parametres));
-            console.log("i am: ", result);
             if (!result.notShow) {
                 message.success(result.message);
             }
-
         } catch (e) {
             message.error(e.message);
         } finally {

@@ -7,5 +7,4 @@ const pool = new Pool({
     database: "studyc_db",
 });
 
-
 module.exports = pool

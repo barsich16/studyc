@@ -9,7 +9,6 @@ export const useMessage = () => {
             } else {
                 message.success(status.message);
             }
-
         }
     },[])
 }

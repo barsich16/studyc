@@ -1,26 +1,26 @@
-/*@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');*/
 .rightSider {
-    /*background: rgba(255, 255, 255, 0.3);*/
     border-left: 2px rgb(224, 224, 224) solid;
-    background-image: linear-gradient(
-            135deg, #f5f7fa 0%, #9dbbeb 100%);
+    overflow: hidden;
+    height: 100vh;
+    position: sticky!important;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
 .authProfile {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 55px;
+    height: 65px;
     font-size: 15px;
     border-bottom: 2px rgb(224, 224, 224) solid;
-    /*border-bottom: 1px #f0f0f0 solid;*/
-    /*background: #fff;*/
 }
 .name {
     margin-left: 15px;
     font-weight: 700;
 }
 .wrapper {
-    padding: 5px;
+    width: 300px;
 }
 .eventCard{
     margin-top: 30px;
@@ -30,17 +30,21 @@
 }
 
 .classTeacher{
-    font-size: 10px;
+    font-size: 11px;
 }
 .info {
     width: 250px;
     font-family: 'Roboto', sans-serif;
-    margin-top: 40px;
+    margin-top: 30px;
 }
 .teacherName {
     margin-top: 30px;
     font-size: 18px;
     font-weight: 700;
+    text-align: center;
+}
+.about {
+    margin-top: 20px;
 }
 .about span {
     font-weight: 700;
@@ -51,4 +55,3 @@
     color: rgba(0,0,0,.5);
     margin-top: 5px;
 }
-

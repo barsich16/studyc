@@ -1,186 +1,213 @@
-import React, {useEffect, useState} from "react";
-import {Button, Form, Input, InputNumber, Layout, Select, Space, Divider, Typography} from "antd";
+import React, {useEffect, useRef, useState} from "react";
+import {Button, Form, Input, InputNumber, Layout, Select, Space, Divider, Typography, Radio} from "antd";
 import styles from "./StudyPlans.module.css";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {useDispatch, useSelector} from "react-redux";
-import {deletePlan, getPlans, updatePlans} from "../../redux/teacherReducer";
-import {useFetching} from "../../hooks/useFetchingDispatch.hook";
+import {useSelector} from "react-redux";
+import {useFetching} from "../../hooks/useFetching.hook";
+import {getChangedEvents, sortPlansBySemester} from "../../common/sortFunctions";
+import {useActions} from "../../hooks/useActions";
+import {CopyPlanModal} from "./CopyPlanModal";
+import Loader from "../Loader";
+import usePrompt from "../../hooks/usePrompt.hook";
+import {message} from "antd";
+import {InputWithTooltip} from "../common/InputWithTooltip";
 
 const {Header, Content} = Layout;
 const {Option, OptGroup} = Select;
 
-const StudyPlans = () => {
-
+const StudyPlans = ({plans, typesEvents}) => {
     const [form] = Form.useForm();
-    const dispatch = useDispatch();
-    const {fetching, loading} = useFetching();
-    const [activePlan, setActivePlan] = useState(null);
-    const plans = useSelector(state => state.teacher.studyPlans);
-    const [studyPlans, setStudyPlans] = useState(null);
-    useEffect(() => {
-        setStudyPlans(plans)
-    }, [plans]);
-    const typesEvents = useSelector(state => state.teacher.typesEvents);
+    const {fetching} = useFetching();
+    const {updatePlans, deletePlan} = useActions();
+    const isUnsavedChanges = useRef(false);
+    usePrompt("Ви дійсно хочете піти? Всі незбережені дані буде утрачено", isUnsavedChanges.current);
 
-    let options = [];
-    const newOptions = [];
-    if (studyPlans) {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [activePlan, setActivePlan] = useState(null);
+    const [studyPlans, setStudyPlans] = useState(plans);
+    const [nameNewPlan, setNameNewPlan] = useState('');
+
+    const generateStudyPlansOptions = (studyPlans) => {
+        let options = [];
+
         const arrayForMaping = studyPlans.slice();
-        arrayForMaping.sort((a,b) => {return a.class_number - b.class_number});
-        while(arrayForMaping.length > 0) {
+        arrayForMaping.sort((a, b) => {
+            return a.class_number - b.class_number
+        });
+
+        while (arrayForMaping.length > 0) {
             const elements = arrayForMaping.filter(elem => elem.class_number === arrayForMaping[0].class_number);
             const newOpt = elements.map(plan => {
                 return <Option key={plan.id} value={plan.id}>{plan.name}</Option>
             });
+
             const groupLabel = arrayForMaping[0].class_number
                 ? `${arrayForMaping[0].class_number} клас`
                 : 'Не збережені'
-            newOptions.push(
+            options.push(
                 <OptGroup key={groupLabel} label={groupLabel}>
                     {newOpt}
                 </OptGroup>
             )
             arrayForMaping.splice(0, elements.length);
         }
-        // for (const arrayForMapingElement of arrayForMaping) {
-        //     const elements = arrayForMaping.filter(elem => elem.class_number === arrayForMapingElement.class_number);
-        //
-        // }
-        // options = studyPlans.map(plan => {
-        //     return <Option key={plan.id} value={plan.id}>{plan.name}</Option>
-        // })
-    }
-
-
-    const [nameNewPlan, setNameNewPlan] = useState('');
-    const onNameChange = event => {
-        setNameNewPlan(event.target.value);
-    };
-    let index = 0;
-
-    const addItem = e => {
-        e.preventDefault();
-        setStudyPlans([...studyPlans, {id: nameNewPlan, isPlanNew: true, name: nameNewPlan || `Навчальний план ${index++}`}]);
-        setNameNewPlan('');
+        return options;
     };
 
-    useEffect(() => {
-        if (!studyPlans) {
-            dispatch(getPlans());
-        }
-    }, [])
-    const onFinish = (values) => {
-        values.id = activePlan.id;
-        if (activePlan.isPlanNew) {
-            values.isPlanNew = true;
-        }
-        if (!values.events) {
-            values.events = null;
-        } else {
-            values.events.forEach((item, index) => {
-                item.order_number = index+= 1;
-            });
-        }
-
-        fetching(updatePlans, values);
-    };
-    const deletePlanHandler = () => {
-        if (activePlan.isPlanNew) {
-            const newStudyPlans = studyPlans.filter(plan => plan.id !== activePlan.id);
-            setStudyPlans(newStudyPlans);
-        } else {
-            fetching(deletePlan, activePlan.id);
-        }
-        form.setFieldsValue({
-            name: null,
-            class_number: null,
-            events: null
-        });
-    }
-    //TODO: видалення навчального плану, форматувати вивід подій в предметах, рефактор планів
-
+    const generatedOptions = React.useMemo(() => generateStudyPlansOptions(studyPlans), [plans, studyPlans]);
     const selects = typesEvents.map(type => {
         return <Option key={type.id} value={type.id}>{type.type}</Option>
     })
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+
+    //Props for CopyPlanModal
+    const closeModal = React.useCallback(() => setIsModalVisible(false), []);
+    const confirmChoose = React.useCallback(copyPlanId => {
+        const plan = studyPlans.find(item => item.id === copyPlanId);
+        form.setFieldsValue({events: plan.events});
+    }, []);
+    const filterStudyPlans = React.useCallback(studyPlan => generateStudyPlansOptions(studyPlan), []);
+
+    //Handlers
+    const handleYearChange = event => {
+        const filteredStudyPlans = plans.filter(plan => plan.year === event);
+        setStudyPlans(filteredStudyPlans);
+    }
+
+    const defaultAutoIncrement = useRef(0);
+    const addItem = e => {
+        e.preventDefault();
+        const today = new Date();
+        setStudyPlans([...studyPlans, {
+            id: nameNewPlan,
+            isPlanNew: true,
+            name: nameNewPlan || `Навчальний план ${defaultAutoIncrement.current++}`,
+            year: today.getFullYear(),
+        }]);
+        setNameNewPlan('');
+        isUnsavedChanges.current = true;
     };
-    const handleChange = value => {
+
+    const onFinish = (values) => {
+        if (values.events) {
+            values.events.sort(sortPlansBySemester);
+            values.events
+                .forEach((item, index) => {
+                item.order_number = index += 1;
+            });
+            if (activePlan.isPlanNew || !activePlan.events) { // якщо план новий або пустий, то можуть бути лише додані події
+                values.events = {addedEvents: values.events}
+            } else {
+                values.events = getChangedEvents(activePlan.events, values.events);
+            }
+        }
+        const requestData = {
+            ...values,
+            id: activePlan.id,
+            year: activePlan.year,
+            isPlanNew: activePlan.isPlanNew,
+            study_plan_id: activePlan.study_plan_id,
+        }
+        isUnsavedChanges.current = false;
+    };
+
+    const deletePlanHandler = () => {
+        const newStudyPlans = studyPlans.filter(plan => plan.id !== activePlan.id);
+        setStudyPlans(newStudyPlans);
+        fetching(deletePlan, activePlan.id);
+
+        form.setFieldsValue({
+            name: null,
+            class_number: null,
+            events: null,
+            cabinet: null,
+        });
+        isUnsavedChanges.current = false;
+    }
+
+    const selectStudyPlanChange = value => {
         const plan = studyPlans.find(item => item.id === value);
         setActivePlan(plan);
         form.setFieldsValue({
             name: plan.name,
             class_number: plan.class_number,
-            events: plan.events
+            events: plan.events,
+            cabinet: plan.cabinet,
         });
     }
 
     return (
-        <Layout>
-            <Header></Header>
+        <>
+            <Header/>
             <Content>
                 <h1 className={styles.title}>Навчальні плани</h1>
                 <Form
                     name="plans"
                     form={form}
                     onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
+                    onFinishFailed={() => message.error('Форма заповнена некоректно!')}
                     autoComplete="off"
                     className={styles.form}
-                    // labelCol={{
-                    //     span: 6,
-                    // }}
-                    // wrapperCol={{
-                    //     span: 15,
-                    // }}
                 >
                     <Space style={{display: 'flex'}} align="baseline">
+                        <Form.Item label="Рік:" name="year">
+                            <Select
+                                placeholder="Оберіть рік..."
+                                style={{minWidth: 130}}
+                                onChange={handleYearChange}
+                            >
+                                <Option value={2021}>2021</Option>
+                                <Option value={2022}>2022</Option>
+                            </Select>
+                        </Form.Item>
+
                         <Form.Item
                             label="Назва:" name="name"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please input your username!',
+                                    message: 'Оберіть навчальний план!',
                                 },
                             ]}
                         >
                             <Select
                                 placeholder="Оберіть навчальний план..."
                                 style={{minWidth: 300}}
-                                onChange={handleChange}
+                                onChange={selectStudyPlanChange}
                                 dropdownRender={menu => (
                                     <>
                                         {menu}
-                                        <Divider style={{ margin: '8px 0' }} />
-                                        <Space align="center" style={{ padding: '0 8px 4px' }}>
-                                            <Input placeholder="Введіть назву навчального плану" value={nameNewPlan} onChange={onNameChange} />
-                                            <Typography.Link onClick={addItem} style={{ whiteSpace: 'nowrap' }}>
-                                                <PlusOutlined /> Додати
+                                        <Divider style={{margin: '8px 0'}}/>
+                                        <Space align="center" style={{padding: '0 8px 4px'}}>
+                                            <Input placeholder="Введіть назву навчального плану" value={nameNewPlan}
+                                                   onChange={event => setNameNewPlan(event.target.value)}/>
+                                            <Typography.Link onClick={addItem} style={{whiteSpace: 'nowrap'}}>
+                                                <PlusOutlined/> Додати
                                             </Typography.Link>
                                         </Space>
                                     </>
                                 )}>
-                                {studyPlans && newOptions}
-                                {/*<Option value='1'>Скорочений</Option>*/}
-                                {/*<Option value='2'>Повний загальний</Option>*/}
+                                {studyPlans && generatedOptions}
                             </Select>
                         </Form.Item>
+
                         <Form.Item
                             label="Клас:" name="class_number"
                             rules={[{required: true, message: 'Клас є обов\'язковим!'},]}
                         >
                             <InputNumber min={1} max={12}/>
                         </Form.Item>
-                    </Space>
 
+                        <Form.Item label="Кабінет:" name="cabinet">
+                            <Input placeholder="438-A"/>
+                        </Form.Item>
+                    </Space>
 
                     <h3>План заходів: </h3>
                     <Form.List name="events">
                         {(fields, {add, remove, move}) => (
                             <>
                                 {fields.map(({key, name, ...restField}, index) => (
-
-                                    <Space key={key} style={{display: 'flex'}} align="baseline">
+                                    <Space key={key} style={{display: 'flex', justifyContent: 'space-between'}} align="baseline">
                                         <Form.Item
                                             label="Тема"
                                             {...restField}
@@ -197,51 +224,64 @@ const StudyPlans = () => {
                                             tooltip="Для відображення в журналі оцінок"
                                             rules={[{message: 'Missing last name'}]}
                                         >
-                                            <Input style={{maxWidth: '80px'}}/>
-
+                                            <Input style={{maxWidth: '70px'}}/>
                                         </Form.Item>
-                                        {/*<Tooltip title="Для відображення в журналі оцінок">*/}
-                                        {/*    <QuestionOutlined />*/}
-                                        {/*</Tooltip>*/}
+
                                         <Form.Item
                                             label="Тип"
                                             {...restField}
                                             name={[name, 'id_type_event']}
-                                            rules={[{ required: true, message: 'Missing last name' }]}
+                                            rules={[{required: true, message: 'Missing last name'}]}
                                         >
-                                            <Select placeholder={'Оберіть тип роботи:'} style={{ width: 190 }}>
+                                            <Select placeholder={'Оберіть тип роботи:'} style={{width: 190}}>
                                                 {selects}
                                             </Select>
-
                                         </Form.Item>
+
                                         <Form.Item
                                             label="Примітки"
                                             {...restField}
                                             name={[name, 'notes']}
                                         >
-                                            <Input/>
+                                            <InputWithTooltip />
                                         </Form.Item>
+
+                                        <Form.Item
+                                            name={[name, 'semester']}
+                                            label="Семестр"
+                                            {...restField}
+                                        >
+                                            <Radio.Group style={{display: 'flex'}}>
+                                                <Radio value={1}>1</Radio>
+                                                <Radio value={2}>2</Radio>
+                                            </Radio.Group>
+                                        </Form.Item>
+
                                         <MinusCircleOutlined onClick={() => remove(name)}/>
-                                        {/*<MinusCircleOutlined onClick={() => move(index, ++index)} />*/}
                                         <ArrowUpOutlined onClick={() => move(index, --index)}/>
                                         <ArrowDownOutlined onClick={() => move(index, ++index)}/>
                                     </Space>
                                 ))}
                                 <Form.Item>
-                                    <Button disabled={!activePlan} type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                                    <Button disabled={!activePlan} type="dashed" onClick={() => add()} block
+                                            icon={<PlusOutlined/>}>
                                         Додати захід
                                     </Button>
                                 </Form.Item>
                             </>
                         )}
                     </Form.List>
-                    <Form.Item
-                        wrapperCol={{
-                            span: 12,
-                        }}
-                    >
+                    <Form.Item>
                         <Button type="primary" htmlType="submit" disabled={!activePlan}>
                             Зберегти поточний план
+                        </Button>
+                        <Button
+                            type="primary"
+                            style={{marginLeft: 3}}
+                            disabled={!activePlan}
+                            onClick={() => setIsModalVisible(true)}
+                        >
+                            Скопіювати існуючий план
                         </Button>
                         <Button
                             type="primary"
@@ -253,9 +293,43 @@ const StudyPlans = () => {
                         </Button>
                     </Form.Item>
                 </Form>
+                <CopyPlanModal
+                    isModalVisible={isModalVisible}
+                    confirmChoose={confirmChoose}
+                    closeModal={closeModal}
+                    generateOptions={filterStudyPlans}
+                    allPlans={plans}
+                />
             </Content>
-        </Layout>
+        </>
     );
 }
 
-export default StudyPlans;
+const StudyPlansContainer = () => {
+    const {getPlans, getTypesEvents} = useActions();
+    const plans = useSelector(state => state.teacher.studyPlans);
+    const typesEvents = useSelector(state => state.teacher.typesEvents);
+
+    useEffect(() => {
+        if (!Array.isArray(plans)) {
+            console.log("Dispatch")
+            getPlans();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!typesEvents) {
+            console.log("Запросили типи");
+            getTypesEvents();
+        }
+    }, []);
+
+    if (!plans || !typesEvents) {
+        return <>
+            <Loader/>
+        </>
+    }
+
+    return <StudyPlans plans={plans} typesEvents={typesEvents}/>
+}
+export default StudyPlansContainer;
