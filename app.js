@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const errorMiddleware = require('./middleware/error.middleware');
 
 const app = express();
+app.use(express.static("public"));
 app.use(express.json({ extended: true }));
 app.use(cookieParser());
 //add cors
