@@ -5,7 +5,10 @@ const cookieParser = require("cookie-parser");
 const errorMiddleware = require('./middleware/error.middleware');
 
 const app = express();
-app.use('/client', express.static('public'));
+app.use(express.static(path.join(__dirname, "/client")));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
+});
 app.use(express.json({ extended: true }));
 app.use(cookieParser());
 //add cors
