@@ -3,6 +3,7 @@ const express = require('express');
 const config = require('config');
 const cookieParser = require("cookie-parser");
 const errorMiddleware = require('./middleware/error.middleware');
+const path = require("path");
 
 const app = express();
 app.use(express.static(path.join(__dirname, "/client")));
